@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "api_token": "{{env `DIGITALOCEAN_TOKEN`}}"
+  },
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum -y update",
+        "sudo yum -y upgrade",
+        "sudo yum install -y https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest.el7.noarch.rpm",
+        "sudo yum clean expire-cache",
+        "sudo yum install -y salt-master salt-minion salt-ssh salt-syndic salt-cloud salt-api",
+        "sudo mkdir -p /etc/salt/minion_id",
+        "sudo yum install -y nmap-ncat tmux bind-utils perl git",
+        "sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm",
+        "sudo yum install jq -y",
+        "mkdir -p /etc/ssh && echo 'WARNING' > /etc/ssh/sshd-banner",
+        "echo 'Banner /etc/ssh/sshd-banner' >> /etc/ssh/sshd_config"
+      ]
+    },
+    {
+      "type": "mondoo",
+      "use_proxy": true,
+      "incognito": true,
+      "policybundle": "centos7-policy.yaml"
+    }
+  ],
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `api_token`}}",
+      "image": "centos-7-x64",
+      "ssh_username": "root", 
+      "region": "nyc1",
+      "size": "s-4vcpu-8gb"
+    }
+  ]
+}

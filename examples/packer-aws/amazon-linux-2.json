@@ -1,0 +1,47 @@
+{
+  "variables": {
+    "profile": "{{env `AWS_PROFILE`}}",
+    "aws_region": "{{env `AWS_REGION`}}",
+    "prefix": "{{env `PACKER_BUILD_PREFIX`}}",
+    "timestamp": "{{isotime `20060102150405`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "amzn2-ami-kernel-5.*-x86_64-gp2",
+        "root-device-type": "ebs"
+      },
+      "owners": ["137112412989"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ec2-user",
+    "ami_name": "{{user `prefix`}}-amzn2-kernel-5.10-{{user `timestamp`}}",
+    "tags": {
+      "Name": "Packer Builder - Amazon Linux 2",
+      "Base_AMI_Name": "{{ .SourceAMIName }}",
+      "Source_AMI": "{{ .SourceAMI }}",
+      "Source_AMI_Creation_Date": "{{ .SourceAMICreationDate }}"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline":[
+        "ls -l /home/ec2-user"
+      ]
+    },
+    {
+      "type": "mondoo",
+      "on_failure": "continue",
+      "labels": {
+        "mondoo.app/ami-name":  "{{user `ami_name`}}",
+        "asset_name": "Packer Build - Amazon Linux 2",
+        "created_on":"{{user `timestamp`}}"
+      }
+    }
+  ]
+}

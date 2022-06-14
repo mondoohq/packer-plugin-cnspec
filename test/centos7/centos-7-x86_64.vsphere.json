@@ -1,0 +1,55 @@
+{
+  "builders": [
+    {
+      "type": "vsphere-iso",
+
+      "vcenter_server":      "{{user `vcenter_server`}}",
+      "username":            "{{user `username`}}",
+      "password":            "{{user `password`}}",
+      "host":                "{{user `host`}}",
+      "insecure_connection": "true",
+
+      "vm_name": "example-centos",
+      "guest_os_type": "centos7_64Guest",
+      "CPUs":             1,
+      "RAM":              1024,
+      "RAM_reserve_all": true,
+
+      "disk_controller_type":  "pvscsi",
+      "storage": [{
+        "disk_size":        32768,
+        "disk_thin_provisioned": true
+      }],
+      "network_adapters": [{"network_card": "vmxnet3"}],
+
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart.cfg<enter>",
+        "<wait10><wait10><wait10>",
+        "<wait10><wait10><wait10>"
+      ],
+      "boot_wait": "10s",
+      "http_directory": "http",
+      "iso_checksum": "sha256:659691c28a0e672558b003d223f83938f254b39875ee7559d1a4a14c79173193",
+      "iso_url": "http://ftp.usf.edu/pub/centos/7.8.2003/isos/x86_64/CentOS-7-x86_64-Minimal-2003.iso",
+      "shutdown_command": "echo 'vagrant'| sudo -S /sbin/poweroff",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_timeout": "10m",
+      "ssh_username": "vagrant"
+    }
+  ],
+  "description": "Build CentOS 7 x86_64",
+  "provisioners": [
+    {
+      "scripts": [
+        "scripts/prepare.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "debug": true,
+      "type": "mondoo",
+      "use_proxy": true
+    }
+  ]
+}

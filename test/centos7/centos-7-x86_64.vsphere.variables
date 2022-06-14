@@ -1,0 +1,6 @@
+{
+  "vcenter_server":"<ip>",
+  "username":"<user>",
+  "password":"<password>",
+  "host": "<esxi_hostname>"
+}

@@ -1,0 +1,100 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "root<enter><wait>",
+        "ifconfig eth0 up \u0026\u0026 udhcpc -i eth0<enter><wait10>",
+        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
+        "setup-alpine -f $PWD/answers<enter><wait5>",
+        "{{user `root_password`}}<enter><wait>",
+        "{{user `root_password`}}<enter><wait>",
+        "<wait10>y<enter>",
+        "<wait10><wait10>",
+        "reboot<enter>",
+        "<wait10><wait10>",
+        "root<enter><wait5>",
+        "{{user `root_password`}}<enter><wait5>",
+        "echo http://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories<enter>",
+        "apk add sudo<enter><wait5>",
+        "echo 'Defaults env_keep += \"http_proxy https_proxy\"' > /etc/sudoers.d/wheel<enter>",
+        "echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel<enter>",
+        "adduser {{user `ssh_username`}}<enter><wait5>",
+        "{{user `ssh_password`}}<enter><wait>",
+        "{{user `ssh_password`}}<enter><wait>",
+        "adduser {{user `ssh_username`}} wheel<enter><wait5>",
+        "apk add virtualbox-guest-additions virtualbox-guest-modules-virt<enter>",
+        "<wait10>"
+      ],
+      "boot_wait": "10s",
+      "communicator": "ssh",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_additions_mode": "disable",
+      "guest_os_type": "Linux26_64",
+      "hard_drive_interface": "sata",
+      "headless": false,
+      "http_directory": "http",
+      "iso_checksum": "sha256:86c511faf8232eace478760695f5dbeeb93a16003576317e16a9e3816355e6b7",
+      "iso_urls": [
+        "isos/alpine-virt-3.11.6-x86_64.iso",
+        "http://dl-cdn.alpinelinux.org/alpine/v3.11/releases/x86_64/alpine-virt-3.11.6-x86_64.iso"
+      ],
+      "shutdown_command": "echo {{user `ssh_password`}} | sudo -S /sbin/poweroff",
+      "ssh_file_transfer_method": "scp",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_timeout": "10m",
+      "ssh_username": "{{user `ssh_username`}}",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `memory`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `cpus`}}"
+        ]
+      ],
+      "virtualbox_version_file": ".vbox_version"
+    }
+  ],
+  "description": "Build Alpine Linux x86_64",
+  "post-processors": [
+    [
+      {
+        "output": "output.box",
+        "type": "vagrant",
+        "vagrantfile_template": "Vagrantfile"
+      }
+    ]
+  ],
+  "provisioners": [
+    {
+      "override": {
+        "virtualbox-iso": {
+          "execute_command": "/bin/sh '{{.Path}}'"
+        }
+      },
+      "scripts": [
+        "scripts/prepare.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "type": "mondoo",
+      "asset_name": "my custom asset name",
+      "on_failure": "continue"
+    }
+  ],
+  "variables": {
+    "cpus": "1",
+    "disk_size": "10240",
+    "memory": "1024",
+    "root_password": "password!",
+    "ssh_password": "vagrant",
+    "ssh_username": "vagrant"
+  }
+}

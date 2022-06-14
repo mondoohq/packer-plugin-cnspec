@@ -1,0 +1,99 @@
+policies:
+  - uid: custom-centos7-policy
+    name: CentOS 7 Virtual Machine Configuration Policy
+    version: 1.0.0
+    authors:
+      - name: Mondoo Inc
+        email: hello@mondoo.io
+    tags:
+      date: 18-09-2020
+    specs:
+      - asset_filter:
+          query: |
+            platform.name == "centos"
+        scoring_queries:
+          verify-centos-version:
+          verify-salt-configuration:
+          tools-installed:
+          verify-sshd-config:
+          mount-fs-root:
+          user-configuration:
+    scoring_system: 2
+queries:
+  - uid: verify-centos-version
+    query: |
+      platform.release == /7.9.2009/
+  - uid: salt-repo-and-package-installed
+    title: Ensure the salt repo is configured and its package is installed
+    query: |
+      package('salt-minion').installed
+
+      yum.repo('salt-latest') {
+        enabled
+      }
+  - uid: verify-salt-configuration
+    title: Ensure the Salt Minion is registered
+    query: |
+      file('/etc/salt/minion.d') {
+        exists
+        permissions.isDirectory
+      }
+  - uid: tools-installed
+    title: Ensure standard tools are installed
+    query: |
+      package('nmap-ncat').installed
+      package('tmux').installed
+      package('bind-utils').installed
+      package('perl').installed
+      package('git').installed
+      file('/usr/bin/jq').exists
+  - uid: verify-sshd-config
+    title: Ensure SSH Protocol and Banner are set correctly
+    query: |
+      // It's not configured by default as the default is version 2
+      sshd.config.params['Protocol'] == null
+      sshd.config.params['Protocol'] != 1
+
+      // Check the ssh banner
+      sshd.config.params['Banner'] == '/etc/ssh/sshd-banner'
+      file('/etc/ssh/sshd-banner') {
+        content == /WARNING/
+      }
+  - uid: mount-fs-root
+    title: Ensure correct settings for / partition
+    query: |
+      // ensure the mountpoint exists
+      mount.one( path == "/" )
+
+      // check the configuration
+      mount.where( path == "/" ).list {
+        device == '/dev/vda1'
+        fstype == 'xfs'
+
+        options['rw'] != null
+        options['relatime'] != null
+        options['seclabel'] != null
+        options['attr2'] != null
+        options['inode64'] != null
+        options['noquota'] != null
+      }
+  - uid: user-configuration
+    title: Ensure the monitoring user exists and has a configured ssh public key setup
+    query: |
+      // ensure the user exists
+      users.one( name == 'centos')
+
+      // ensure we have authorized_keys
+      user(name: 'centos').authorizedkeys.length == 1
+
+      // ensure authorized file permissions
+      user(name: 'centos').authorizedkeys.file {
+        size > 128
+        permissions {
+          mode == 0600
+        }
+        user.name == 'centos'
+      }
+
+      // ensure the user can run sudo
+      groups.where(name == 'wheel').list { members.one( name == 'centos') }

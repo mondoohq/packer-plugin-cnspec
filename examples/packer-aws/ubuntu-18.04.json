@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "profile": "{{env `AWS_PROFILE`}}",
+    "aws_region": "{{env `AWS_REGION`}}",
+    "prefix": "{{env `PACKER_BUILD_PREFIX`}}",
+    "timestamp": "{{isotime `20060102150405`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "{{user `prefix`}}-ubuntu1804-{{user `timestamp`}}",
+    "tags": {
+      "Name": "Packer Builder - Ubuntu 18.04",
+      "Base_AMI_Name": "{{ .SourceAMIName }}",
+      "Source_AMI": "{{ .SourceAMI }}",
+      "Source_AMI_Creation_Date": "{{ .SourceAMICreationDate }}"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline":[
+        "ls -l /home/ubuntu"
+      ]
+    },
+    {
+      "type": "mondoo",
+      "on_failure": "continue",
+      "labels": {
+        "mondoo.app/ami-name":  "{{user `ami_name`}}",
+        "name":"Packer Builder - Ubuntu 18.04",
+        "asset_name": "Packer Build - Ubuntu 18.04",
+        "created_on":"{{user `timestamp`}}"
+      }
+    }
+  ]
+}
