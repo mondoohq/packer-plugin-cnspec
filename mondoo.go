@@ -1,14 +1,5 @@
 package main
 
-// Version is set via ldflags
-var Version string
-
-// Build version is set via ldflags
-var Build string
-
-// Build date is set via ldflags
-var Date string
-
 type VulnOpts struct {
 	Assets         []*Asset        `json:"assets,omitempty" mapstructure:"assets"`
 	Report         *VulnOptsReport `json:"report,omitempty" mapstructure:"report"`

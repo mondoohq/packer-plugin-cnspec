@@ -1,6 +1,6 @@
 .PHONY: prep/plugins install build test
 
-PROVISIONER_BINARY_NAME=packer-provisioner-mondoo
+PROVISIONER_BINARY_NAME=packer-plugin-mondoo
 PLUGINS_DIR=~/.packer.d/plugins
 
 prep/plugins:
@@ -13,7 +13,7 @@ build/snapshot:
 	goreleaser --snapshot --skip-publish --rm-dist
 
 build/dev:
-	CGO_ENABLED=0 installsuffix=cgo go build -ldflags="-X 'main.Version=development'" -o ./dist/${PROVISIONER_BINARY_NAME}
+	CGO_ENABLED=0 installsuffix=cgo go build -ldflags="-X 'version.Version=development'" -o ./dist/${PROVISIONER_BINARY_NAME}
 
 install: prep/plugins build/dev
 	rm ${PLUGINS_DIR}/${PROVISIONER_BINARY_NAME} || true
