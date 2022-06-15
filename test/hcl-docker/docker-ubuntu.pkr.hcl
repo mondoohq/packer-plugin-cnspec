@@ -4,6 +4,10 @@ packer {
       version = ">= 0.0.7"
       source  = "github.com/hashicorp/docker"
     }
+    mondoo = {
+      version = ">= 0.2.1"
+      source  = "github.com/mondoohq/mondoo"
+    }
   }
 }
 
