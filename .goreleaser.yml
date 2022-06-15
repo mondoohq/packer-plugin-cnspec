@@ -19,11 +19,7 @@ builds:
 archives:
   - id: releases
     name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
-    wrap_in_directory: false
-    format: tar.gz
-    format_overrides:
-      - goos: windows
-        format: zip
+    format: zip
     files:
       - none*
 checksum:
