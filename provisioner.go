@@ -26,6 +26,7 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 	"github.com/mitchellh/mapstructure"
+	"go.mondoo.com/packer-plugin-mondoo/version"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -154,7 +155,7 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 }
 
 func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.Communicator, generatedData map[string]interface{}) error {
-	ui.Say("Running mondoo (Version: " + Version + ", Build: " + Build + ")")
+	ui.Say("Running mondoo (Version: " + version.Version + ", Build: " + version.Build + ")")
 
 	err := mapstructure.Decode(generatedData, &p.buildInfo)
 	if err != nil {
