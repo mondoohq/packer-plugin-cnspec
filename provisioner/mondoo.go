@@ -1,4 +1,4 @@
-package main
+package provisioner
 
 type VulnOpts struct {
 	Assets         []*Asset        `json:"assets,omitempty" mapstructure:"assets"`
