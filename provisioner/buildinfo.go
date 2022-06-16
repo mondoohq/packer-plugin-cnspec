@@ -1,4 +1,4 @@
-package main
+package provisioner
 
 // https://www.packer.io/docs/templates/legacy_json_templates/engine
 type BuildInfo struct {
