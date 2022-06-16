@@ -15,8 +15,7 @@ type BuildInfo struct {
 	PackerRunUUID  string `json:"PackerRunUUID"`
 	Password       string `json:"Password"`
 
-	SSHAgentAuth      bool   `json:"SSHAgentAuth"`
-	SSHPrivateKey     string `json:"SSHPrivateKey"`
-	SSHPrivateKeyFile string `json:"SSHPrivateKeyFile"`
-	SSHPublicKey      string `json:"SSHPrivateKeyFile"`
+	SSHAgentAuth  bool   `json:"SSHAgentAuth"`
+	SSHPrivateKey string `json:"SSHPrivateKey"`
+	SSHPublicKey  string `json:"SSHPublicKey"`
 }
