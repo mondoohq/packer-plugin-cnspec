@@ -382,6 +382,11 @@ func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm pack
 		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(100)}...)
 	}
 
+	// If annotations are not specified, this will error out so make sure to init the map.
+	if p.config.Annotations == nil {
+		p.config.Annotations = map[string]string{}
+	}
+
 	// labels are deprecated, therefore we merge them with annotations
 	for k := range p.config.Labels {
 		p.config.Annotations[k] = p.config.Labels[k]
