@@ -10,7 +10,7 @@ build/generate:
 	go generate ./...
 
 build/snapshot:
-	goreleaser --snapshot --skip-publish --rm-dist
+	API_VERSION=x5.0 goreleaser release --snapshot --skip-publish --rm-dist
 
 build/dev:
 	CGO_ENABLED=0 installsuffix=cgo go build -ldflags="-X 'version.Version=development'" -o ./dist/${PROVISIONER_BINARY_NAME}
