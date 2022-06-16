@@ -11,6 +11,12 @@ packer {
   }
 }
 
+variable "aws_profile" {
+  type = string
+  description = "AWS profile to use. Typically found in ~/.aws/credentials"
+  default = "default"
+}
+
 variable "aws_region" {
   default = "us-east-1"
   type    = string
@@ -25,7 +31,7 @@ variable "image_prefix" {
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 source "amazon-ebs" "windows2019" {
-  profile       = "default"
+  profile       = var.aws_profile
   ami_name      = "${var.image_prefix}-${local.timestamp}"
   communicator  = "winrm"
   instance_type = "t2.micro"
