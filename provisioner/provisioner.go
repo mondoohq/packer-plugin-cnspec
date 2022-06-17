@@ -157,7 +157,7 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 }
 
 func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.Communicator, generatedData map[string]interface{}) error {
-	ui.Say("Running mondoo (Version: " + version.Version + ", Build: " + version.Build + ")")
+	ui.Say("Running Mondoo packer provisioner (Version: " + version.Version + ", Build: " + version.Build + ")")
 
 	err := mapstructure.Decode(generatedData, &p.buildInfo)
 	if err != nil {
