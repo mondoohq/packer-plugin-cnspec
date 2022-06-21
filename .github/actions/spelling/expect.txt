@@ -1,4 +1,4 @@
-Config
+aws
 dns
 ESXi
 github
