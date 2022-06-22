@@ -1,15 +1,20 @@
 # Packer Plugin Mondoo
 
-`Mondoo` tests [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of certified security policies which can be easily customize to meet your needs. 
+`Mondoo` scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of certified security policies which can be easily customize to meet your needs. 
+
+Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
+
+## Get Started with Mondoo
 
 If you are new to Mondoo you can get started by [signing up for a free account](https://mondoo.com/docs/tutorials/mondoo/account-setup/) today!
 
-Mondoo supports Linux, Windows, and macOS, as well as Docker container builds. 
+## Packer Plugin Mondoo tutorial
 
-## Installation
+Check out the [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) tutorial on the Mondoo documentation site.
 
-### Using pre-built releases
-#### Using the packer init command
+# Installation
+
+## Using the packer init command
 Starting from version 1.7, Packer supports a new `packer init` command allowing automatic installation of Packer plugins. Read the [Packer documentation](https://www.packer.io/docs/commands/init) for more information.
 
 To install this plugin, copy and paste this code into your Packer configuration . Then, run `packer init`.
@@ -28,6 +33,7 @@ packer {
 #### Manual installation
 
 You can find pre-built binary releases of the plugin [here](https://github.com/mondoohq/packer-plugin-mondoo/releases).
+
 Once you have downloaded the latest archive corresponding to your target OS, uncompress it to retrieve the plugin binary file corresponding to your platform. To install the plugin, please follow the Packer documentation on
 [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
