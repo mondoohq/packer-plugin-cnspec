@@ -28,6 +28,12 @@ variable "image_prefix" {
   default = "mondoo-windows2019-secure-base"
 }
 
+variable "mondoo_config_path" {
+  type = string
+  description = "The path to the config to be used when scanning"
+  default = ""
+}
+
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 source "amazon-ebs" "windows2019" {
@@ -57,7 +63,7 @@ build {
   provisioner "mondoo" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
-
+    mondoo_config_path = "${var.mondoo_config_path}"
     annotations = {
       Source_AMI    = "{{ .SourceAMI }}"
       Creation_Date = "{{ .SourceAMICreationDate }}"
