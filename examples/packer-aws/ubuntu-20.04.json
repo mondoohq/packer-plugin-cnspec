@@ -3,7 +3,8 @@
     "profile": "{{env `AWS_PROFILE`}}",
     "aws_region": "{{env `AWS_REGION`}}",
     "prefix": "{{env `PACKER_BUILD_PREFIX`}}",
-    "timestamp": "{{isotime `20060102150405`}}"
+    "timestamp": "{{isotime `20060102150405`}}",
+    "mondoo_config_path": ""
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -37,6 +38,7 @@
     {
       "type": "mondoo",
       "on_failure": "continue",
+      "mondoo_config_path": "{{user `mondoo_config_path`}}",
       "labels": {
         "mondoo.app/ami-name":  "{{user `ami_name`}}",
         "name":"Packer Builder - Ubuntu 20.04",

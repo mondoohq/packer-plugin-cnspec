@@ -23,7 +23,7 @@ To install this plugin, copy and paste this code into your Packer configuration 
 packer {
   required_plugins {
     mondoo = {
-      version = ">= 0.2.1"
+      version = ">= 0.3.0"
       source  = "github.com/mondoohq/mondoo"
     }
   }
@@ -50,6 +50,7 @@ If you prefer to build the plugin from sources, clone the GitHub repository loca
 | `on_failure`      | Set `on_failure = "continue"` to ignore build failures that do not meet any set `score_threshold`.| `string` | None | No |
 | `score_threshold` | Set a score threshold for Packer builds `[0-100]`. Any scans that fall below the `score_threshold` will fail unless `on_failure = "continue"`. For more information see [Policy Scoring](https://mondoo.com/docs/platform/policies/scoring/index.html) in the Mondoo documentation. | `int`            | None        | No           |
 | `sudo`            | Use sudo to elevate permissions when running Mondoo scans. | `bool`         | None        | No           |
+| `mondoo_config_path`            | The path to the configuration to be used when running Mondoo scans. | `string`         | None        | No           |
 
 
 ### Example: Complete Configuration
@@ -57,6 +58,7 @@ If you prefer to build the plugin from sources, clone the GitHub repository loca
 ```hcl
   provisioner "mondoo" {
     on_failure      = "continue"
+    mondoo_config_path = "/etc/mondoo-config.json"
     score_threshold = 85
     asset_name      = "example-secure-base-image"
     sudo {

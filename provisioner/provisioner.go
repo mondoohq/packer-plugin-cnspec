@@ -64,8 +64,9 @@ type Config struct {
 	// NOTE: we have seen cases with the vsphere builder
 	UseProxy bool `mapstructure:"use_proxy"`
 
-	Output         string `mapstructure:"output"`
-	ScoreThreshold int    `mapstructure:"score_threshold"`
+	Output           string `mapstructure:"output"`
+	ScoreThreshold   int    `mapstructure:"score_threshold"`
+	MondooConfigPath string `mapstructure:"mondoo_config_path"`
 }
 
 type SudoConfig struct {
@@ -384,6 +385,10 @@ func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm pack
 		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(100)}...)
 	}
 
+	if p.config.MondooConfigPath != "" {
+		cmdargs = append(cmdargs, []string{"--config", p.config.MondooConfigPath}...)
+	}
+
 	// If annotations are not specified, this will error out so make sure to init the map.
 	if p.config.Annotations == nil {
 		p.config.Annotations = map[string]string{}
@@ -427,6 +432,7 @@ func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm pack
 
 	// prep config for mondoo executable
 	mondooScanConf, err := json.Marshal(conf)
+
 	if err != nil {
 		return err
 	}
