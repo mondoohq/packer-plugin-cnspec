@@ -40,6 +40,7 @@ type FlatConfig struct {
 	UseProxy             *bool             `mapstructure:"use_proxy" cty:"use_proxy" hcl:"use_proxy"`
 	Output               *string           `mapstructure:"output" cty:"output" hcl:"output"`
 	ScoreThreshold       *int              `mapstructure:"score_threshold" cty:"score_threshold" hcl:"score_threshold"`
+	MondooConfigPath     *string           `mapstructure:"mondoo_config_path" cty:"mondoo_config_path" hcl:"mondoo_config_path"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -84,6 +85,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"use_proxy":                  &hcldec.AttrSpec{Name: "use_proxy", Type: cty.Bool, Required: false},
 		"output":                     &hcldec.AttrSpec{Name: "output", Type: cty.String, Required: false},
 		"score_threshold":            &hcldec.AttrSpec{Name: "score_threshold", Type: cty.Number, Required: false},
+		"mondoo_config_path":         &hcldec.AttrSpec{Name: "mondoo_config_path", Type: cty.String, Required: false},
 	}
 	return s
 }
