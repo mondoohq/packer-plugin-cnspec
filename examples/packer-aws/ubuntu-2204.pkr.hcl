@@ -25,7 +25,7 @@ variable "aws_region" {
 variable "image_prefix" {
   type        = string
   description = "Prefix to be applied to image name"
-  default     = "mondoo-ubuntu-20.04-secure-base"
+  default     = "mondoo-ubuntu-22.04-secure-base"
 }
 
 variable "mondoo_config_path" {
@@ -36,14 +36,14 @@ variable "mondoo_config_path" {
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
-source "amazon-ebs" "ubuntu2004" {
+source "amazon-ebs" "ubuntu2204" {
   profile       = var.aws_profile
   ami_name      = "${var.image_prefix}-${local.timestamp}"
   instance_type = "t2.micro"
   region        = var.aws_region
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
+      name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -63,7 +63,7 @@ build {
   name = "${var.image_prefix}-${local.timestamp}"
 
   sources = [
-    "source.amazon-ebs.ubuntu2004"
+    "source.amazon-ebs.ubuntu2204"
   ]
 
   provisioner "shell" {
@@ -78,6 +78,7 @@ build {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
     mondoo_config_path = "${var.mondoo_config_path}"
+
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"
       Base_AMI_Name = "{{ .SourceAMIName }}"
