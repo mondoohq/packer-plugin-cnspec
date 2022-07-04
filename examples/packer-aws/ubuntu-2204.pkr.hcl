@@ -5,7 +5,7 @@ packer {
       source  = "github.com/hashicorp/amazon"
     }
     mondoo = {
-      version = ">= 0.2.1"
+      version = ">= 0.4.0"
       source  = "github.com/mondoohq/mondoo"
     }
   }
@@ -26,6 +26,12 @@ variable "image_prefix" {
   type        = string
   description = "Prefix to be applied to image name"
   default     = "mondoo-ubuntu-22.04-secure-base"
+}
+
+variable "mondoo_config_path" {
+  type = string
+  description = "The path to the config to be used when scanning"
+  default = ""
 }
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
@@ -71,6 +77,7 @@ build {
   provisioner "mondoo" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
+    mondoo_config_path = "${var.mondoo_config_path}"
 
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"

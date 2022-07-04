@@ -23,7 +23,7 @@ To install this plugin, copy and paste this code into your Packer configuration 
 packer {
   required_plugins {
     mondoo = {
-      version = ">= 0.3.0"
+      version = ">= 0.4.0"
       source  = "github.com/mondoohq/mondoo"
     }
   }
