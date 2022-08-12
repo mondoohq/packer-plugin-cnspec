@@ -1,6 +1,5 @@
 {
   "variables": {
-    "profile": "{{env `AWS_PROFILE`}}",
     "aws_region": "{{env `AWS_REGION`}}",
     "prefix": "{{env `PACKER_BUILD_PREFIX`}}",
     "timestamp": "{{isotime `20060102150405`}}",
