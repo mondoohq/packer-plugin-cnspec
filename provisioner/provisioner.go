@@ -1,6 +1,7 @@
 package provisioner
 
 //go:generate go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc mapstructure-to-hcl2 -type Config,SudoConfig
+//go:generate packer-sdc struct-markdown
 
 import (
 	"bufio"
@@ -33,39 +34,76 @@ import (
 )
 
 type Config struct {
-	common.PackerConfig  `mapstructure:",squash"`
-	Command              string // The command to run mondoo
-	ctx                  interpolate.Context
-	HostAlias            string `mapstructure:"host_alias"`
-	User                 string `mapstructure:"user"`
-	LocalPort            uint   `mapstructure:"local_port"`
-	SSHHostKeyFile       string `mapstructure:"ssh_host_key_file"`
+	common.PackerConfig `mapstructure:",squash"`
+	ctx                 interpolate.Context
+	// The command to invoke mondoo. Defaults to `mondoo scan`.
+	Command string
+	// The alias by which the host should be known.
+	// Defaults to `default`.
+	HostAlias string `mapstructure:"host_alias"`
+	// The `user` set for your communicator. Defaults to the `user` set
+	// by packer.
+	User string `mapstructure:"user"`
+	// The port on which to attempt to listen for SSH
+	//  connections. This value is a starting point. The provisioner will attempt
+	//  listen for SSH connections on the first available of ten ports, starting at
+	//  `local_port`. A system-chosen port is used when `local_port` is missing or
+	//  empty.
+	LocalPort uint `mapstructure:"local_port"`
+	// The SSH key that will be used to run the SSH
+	//  server on the host machine to forward commands to the target machine.
+	//  packer connects to this server and will validate the identity of the
+	//  server using the system known_hosts. The default behavior is to generate
+	//  and use a onetime key.
+	SSHHostKeyFile string `mapstructure:"ssh_host_key_file"`
+	// The SSH public key of the packer `ssh_user`.
+	// The default behavior is to generate and use a onetime key.
 	SSHAuthorizedKeyFile string `mapstructure:"ssh_authorized_key_file"`
 	// packer's SFTP proxy is not reliable on some unix/linux systems,
 	// therefore we recommend to use scp as default for packer proxy
-	UseSFTP       bool              `mapstructure:"use_sftp"`
-	Debug         bool              `mapstructure:"debug"`
-	AssetName     string            `mapstructure:"asset_name"`
-	MondooEnvVars []string          `mapstructure:"mondoo_env_vars"`
-	OnFailure     string            `mapstructure:"on_failure"`
-	Labels        map[string]string `mapstructure:"labels"`
-	Annotations   map[string]string `mapstructure:"annotations"`
-	Incognito     bool              `mapstructure:"incognito"`
-	Policies      []string          `mapstructure:"policies"`
-	PolicyBundle  string            `mapstructure:"policybundle"`
-
+	UseSFTP bool `mapstructure:"use_sftp"`
+	// Sets the log level to `DEBUG`
+	Debug bool `mapstructure:"debug"`
+	// The asset name passed to Mondoo Platform. Defaults to the hostname
+	// of the instance.
+	AssetName string `mapstructure:"asset_name"`
+	// Array of environment variables for configuring Mondoo.
+	MondooEnvVars []string `mapstructure:"mondoo_env_vars"`
+	// Configure behavior whether packer should fail if `scan_threshold` is
+	// not met. If `scan_threshold` configuration is omitted, the threshold
+	// is set to `0` and builds will pass regardless of what score is
+	// returned.
+	// If `score_threshold` is set to a value, and `on_failure = "continue"`
+	// builds will continue regardless of what score is returned.
+	OnFailure string `mapstructure:"on_failure"`
+	// Configure an optional map of labels for the asset data in Mondoo Platform.
+	Labels map[string]string `mapstructure:"labels"`
+	// Configure an optional map of `key/val` annotations for the asset data in
+	// Mondoo Platform.
+	Annotations map[string]string `mapstructure:"annotations"`
+	// Configures incognito mode. Defaults to `true`. When set to false, scan results
+	// will not be sent to the Mondoo platform.
+	Incognito bool `mapstructure:"incognito"`
+	// A list of policies to be executed (requires incognito mode).
+	Policies []string `mapstructure:"policies"`
+	// A path to local policy bundle file.
+	PolicyBundle string `mapstructure:"policybundle"`
+	// Run mondoo scan with `--sudo`. Defaults to none.
 	Sudo *SudoConfig `mapstructure:"sudo"`
-
-	// WinRM
-	WinRMUser     string `mapstructure:"winrm_user"`
+	// Configure WinRM user. Defaults to `user` set by the packer communicator.
+	WinRMUser string `mapstructure:"winrm_user"`
+	// Configure WinRM user password. Defaults to `password` set by the packer communicator.
 	WinRMPassword string `mapstructure:"winrm_password"`
-
-	// fall-back to packer proxy for cases where the provisioner cannot access the target directly
+	// Use proxy to connect to host to scan. This configuration will fall-back to packer proxy
+	// for cases where the provisioner cannot access the target directly
 	// NOTE: we have seen cases with the vsphere builder
 	UseProxy bool `mapstructure:"use_proxy"`
-
-	Output           string `mapstructure:"output"`
-	ScoreThreshold   int    `mapstructure:"score_threshold"`
+	// Set output format: summary, full, yaml, json, csv, compact, report, junit (default "compact")
+	Output string `mapstructure:"output"`
+	// An integer value to set the `score_threshold` of mondoo scans. Defaults to `0` which results in
+	// a passing score regardless of what scan results are returned.
+	ScoreThreshold int `mapstructure:"score_threshold"`
+	// The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
 	MondooConfigPath string `mapstructure:"mondoo_config_path"`
 }
 

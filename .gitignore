@@ -4,3 +4,8 @@ packer_cache
 output.box
 test/alpine3.11/output-virtualbox-iso
 .vscode/*.log
+main
+dist/*
+docs-rendered/*
+packer-plugin-mondoo
+.docs

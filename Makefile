@@ -1,39 +1,36 @@
-.PHONY: prep/plugins install build test
+NAME=mondoo
+BINARY=packer-plugin-${NAME}
 
-PROVISIONER_BINARY_NAME=packer-plugin-mondoo
-PLUGINS_DIR=~/.packer.d/plugins
+COUNT?=1
+TEST?=$(shell go list ./...)
+HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/packer-plugin-sdk | cut -d " " -f2)
 
-prep/plugins:
-	mkdir -p ${PLUGINS_DIR}
+.PHONY: dev
 
-build/generate:
-	go generate ./...
+build:
+	@go build -o ${BINARY}
 
-build/snapshot:
-	API_VERSION=x5.0 goreleaser release --snapshot --skip-publish --rm-dist
-
-build/dev:
-	CGO_ENABLED=0 installsuffix=cgo go build -ldflags="-X 'version.Version=development'" -o ./dist/${PROVISIONER_BINARY_NAME}
-
-install: prep/plugins build/dev
-	rm ${PLUGINS_DIR}/${PROVISIONER_BINARY_NAME} || true
-	cp ./dist/${PROVISIONER_BINARY_NAME} ${PLUGINS_DIR}/${PROVISIONER_BINARY_NAME}
+dev: build
+	@mkdir -p ~/.packer.d/plugins/
+	@mv ${BINARY} ~/.packer.d/plugins/${BINARY}
 
 test:
-	go test -v
+	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
-# use -debug & PACKER_LOG=1 to call step modus
-test/packer/json:
-	cd test/alpine3.11 && packer build -force alpine-3.11-x86_64.json
+install-packer-sdc: ## Install packer sofware development command
+	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
 
-test/packer/hcl-virtualbox:
-	cd test/hcl-virtualbox && packer build -force .
+ci-release-docs: install-packer-sdc
+	@packer-sdc renderdocs -src docs -partials docs-partials/ -dst docs/
+	@/bin/sh -c "[ -d docs ] && zip -r docs.zip docs/"
 
-test/packer/hcl-docker:
-	cd test/hcl-docker && packer build -force .
+plugin-check: install-packer-sdc build
+	@packer-sdc plugin-check ${BINARY}
 
-test/packer/proxy:
-	cd test/centos7 && packer build centos-7-x86_64.json
+testacc: dev
+	@PACKER_ACC=1 go test -count $(COUNT) -v $(TEST) -timeout=120m
 
-test/packer/policybundle:
-	cd test/policybundle && packer build centos-7.json
+generate: install-packer-sdc
+	@go generate ./...
+	packer-sdc renderdocs -src ./docs -dst ./.docs -partials ./docs-partials
+	# checkout the .docs folder for a preview of the docs
