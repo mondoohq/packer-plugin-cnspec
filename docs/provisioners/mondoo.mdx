@@ -1,0 +1,47 @@
+---
+description: |
+    The Mondoo packer provisioner scans machine-image builds for vulnerabilities
+    and misconfigurations by executing security policies-as-code.
+page_title: Mondoo - Provisioner
+sidebar_title: Mondoo
+---
+
+# Mondoo Provisioner
+
+Type: `monodoo`
+
+The `mondoo` provisioner scans [Packer](https://www.packer.io)
+builds for vulnerabilities and misconfigurations by executing security
+policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com).
+Mondoo Platform comes stocked with an ever-increasing collection of
+certified security policies which can be easily customize to meet your needs.
+
+Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
+
+### Basic Example
+
+```hcl
+  provisioner "mondoo" {
+    on_failure      = "continue"
+    mondoo_config_path = "/etc/mondoo-config.json"
+    score_threshold = 85
+    asset_name      = "example-secure-base-image"
+    sudo {
+      active = true
+    }
+
+    annotations = {
+      Source_AMI    = "{{ .SourceAMI }}"
+      Creation_Date = "{{ .SourceAMICreationDate }}"
+    }
+  }
+}
+```
+
+## Configuration Reference
+
+### Optional:
+@include '/provisioner/Config-not-required.mdx'
+
+#### SudoConfig
+@include '/provisioner/SudoConfig-not-required.mdx'
