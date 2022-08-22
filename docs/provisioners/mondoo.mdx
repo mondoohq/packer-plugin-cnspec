@@ -8,7 +8,7 @@ sidebar_title: Mondoo
 
 # Mondoo Provisioner
 
-Type: `monodoo`
+Type: `mondoo`
 
 The `mondoo` provisioner scans [Packer](https://www.packer.io)
 builds for vulnerabilities and misconfigurations by executing security
@@ -18,14 +18,13 @@ certified security policies which can be easily customize to meet your needs.
 
 Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
 
-### Basic Example
-
+## Basic Example
 ```hcl
   provisioner "mondoo" {
-    on_failure      = "continue"
-    mondoo_config_path = "/etc/mondoo-config.json"
-    score_threshold = 85
-    asset_name      = "example-secure-base-image"
+    on_failure          = "continue"
+    mondoo_config_path  = "/etc/mondoo-config.json"
+    score_threshold     = 85
+    asset_name          = "example-secure-base-image"
     sudo {
       active = true
     }
@@ -40,8 +39,20 @@ Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker contain
 
 ## Configuration Reference
 
-### Optional:
+Optional Parameters:
 @include '/provisioner/Config-not-required.mdx'
 
-#### SudoConfig
+### SudoConfig
 @include '/provisioner/SudoConfig-not-required.mdx'
+
+## Get Started with Mondoo
+
+If you are new to Mondoo you can get started by [signing up for a free account](https://mondoo.com/docs/tutorials/mondoo/account-setup/) today!
+
+## Packer Plugin Mondoo tutorial
+
+Check out the [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) tutorial on the Mondoo documentation site.
+
+## Sample Packer Templates
+
+You can find example Packer templates in the [examples](https://github.com/mondoohq/packer-plugin-mondoo/tree/main/examples) directory in this repository.
