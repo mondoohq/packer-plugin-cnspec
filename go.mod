@@ -1,7 +1,7 @@
 module go.mondoo.com/packer-plugin-mondoo
 
 require (
-	github.com/hashicorp/hcl/v2 v2.14.0
+	github.com/hashicorp/hcl/v2 v2.14.1
 	github.com/hashicorp/packer-plugin-sdk v0.3.2
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/stretchr/testify v1.7.1
