@@ -22,6 +22,7 @@ jobs:
           path-to-document: 'https://github.com/mondoohq/.github/blob/master/CLA.md'
           remote-repository-name: cla
           remote-organization-name: mondoohq
+          custom-pr-sign-comment: 'I have read the Mondoo CLA Document and I hereby sign the CLA'
           # branch should not be protected
           branch: 'main'
           allowlist: mondoo-tools
