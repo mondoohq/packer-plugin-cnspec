@@ -86,3 +86,7 @@ You can find example Packer templates in the [examples](/examples/) directory in
   fix a bug, please do so by opening a Pull Request in this GitHub repository.
   In case of feature contribution, we kindly ask you to open an issue to
   discuss it beforehand.
+
+
+DO NOT MERGE THIS
+
