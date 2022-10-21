@@ -412,6 +412,14 @@ func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm pack
 		cmdargs = append(cmdargs, []string{"--output", p.config.Output}...)
 	}
 
+	if password != "" {
+		cmdargs = append(cmdargs, []string{"--password", password}...)
+	}
+
+	if privKeyFile != "" {
+		cmdargs = append(cmdargs, []string{"--identity-file", privKeyFile}...)
+	}
+
 	if p.config.OnFailure == "continue" {
 		// ignore the result of the scan
 		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(0)}...)
