@@ -5,7 +5,7 @@ require (
 	github.com/hashicorp/packer-plugin-sdk v0.3.2
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/stretchr/testify v1.7.1
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.12.0
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 )
 
