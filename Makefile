@@ -8,7 +8,7 @@ HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/pac
 .PHONY: dev
 
 build:
-	@go build -o ${BINARY}
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/packer-plugin-mondoo/version.Version=0.0.0 -X go.mondoo.com/packer-plugin-mondoo/version.Build=dev"
 
 dev: build
 	@mkdir -p ~/.packer.d/plugins/
@@ -17,7 +17,7 @@ dev: build
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
-install-packer-sdc: ## Install packer sofware development command
+install-packer-sdc: ## Install packer software development command
 	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
 
 ci-release-docs: install-packer-sdc

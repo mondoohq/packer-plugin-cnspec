@@ -1,14 +1,14 @@
-# Packer Plugin Mondoo
+# Packer Plugin for Mondoo cnspec
 
-`Mondoo` scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of certified security policies which can be easily customize to meet your needs. 
+[cnspec](https://github.com/mondoohq/cnspec) scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of certified security policies which can be easily customize to meet your needs. 
 
-Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
+cnspec supports scanning of Linux, Windows, and macOS, as well as Docker containers.
 
-## Get Started with Mondoo
+## Get Started with cnspec
 
-If you are new to Mondoo you can get started by [signing up for a free account](https://mondoo.com/docs/tutorials/mondoo/account-setup/) today!
+If you are new to cnspec you can [get started](https://mondoo.com/docs/cnspec/) today!
 
-## Packer Plugin Mondoo tutorial
+## Packer Plugin for Mondoo cnspec tutorial
 
 Check out the [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) tutorial on the Mondoo documentation site.
 
@@ -56,19 +56,17 @@ If you prefer to build the plugin from sources, clone the GitHub repository loca
 ### Example: Complete Configuration
 
 ```hcl
-  provisioner "mondoo" {
-    on_failure      = "continue"
-    mondoo_config_path = "/etc/mondoo-config.json"
-    score_threshold = 85
-    asset_name      = "example-secure-base-image"
-    sudo {
-      active = true
-    }
+provisioner "mondoo" {
+  on_failure      = "continue"
+  score_threshold = 85
+  asset_name      = "example-secure-base-image"
+  sudo {
+    active = true
+  }
 
-    annotations = {
-      Source_AMI    = "{{ .SourceAMI }}"
-      Creation_Date = "{{ .SourceAMICreationDate }}"
-    }
+  annotations = {
+    Source_AMI    = "{{ .SourceAMI }}"
+    Creation_Date = "{{ .SourceAMICreationDate }}"
   }
 }
 ```
