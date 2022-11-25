@@ -203,12 +203,12 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 		if err != nil {
 			return err
 		}
-		ui.Say(string(data))
+		ui.Message("build info: " + string(data))
 	}
 
 	// configure ssh proxy
 	if p.config.UseProxy {
-		ui.Say("configure ssh proxy")
+		ui.Message("configure ssh proxy")
 		k, err := newUserKey(p.config.SSHAuthorizedKeyFile)
 		if err != nil {
 			return err
@@ -328,6 +328,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 
 	assetConfig := &providers.Config{
 		Backend: providers.ProviderType_UNKNOWN,
+		Options: map[string]string{},
 	}
 
 	if p.config.Sudo != nil && p.config.Sudo.Active {
@@ -340,7 +341,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" {
 		ui.Message("detected packer build via ssh")
 		assetConfig.Backend = providers.ProviderType_SSH
-		assetConfig.Host = fmt.Sprintf("%s:%d", p.buildInfo.Host, p.buildInfo.Port)
+		assetConfig.Host = p.buildInfo.Host
+		assetConfig.Port = int32(p.buildInfo.Port)
 		assetConfig.Insecure = true // we do not check the hostkey for the packer build
 		assetConfig.Credentials = []*vault.Credential{}
 
@@ -352,16 +354,17 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		if p.config.UseProxy {
 			ui.Message("use packer's ssh proxy")
 			// overwrite host since we go via the proxy now
-			assetConfig.Host = fmt.Sprintf("%s:%d", "127.0.0.1", p.config.LocalPort)
+			assetConfig.Host = "127.0.0.1"
+			assetConfig.Port = int32(p.config.LocalPort)
 
 			// NOTE: packer proxy only allows one auth mechanism
 			cred, err := vault.NewPrivateKeyCredentialFromPath(p.config.User, p.adapterPrivKeyFile, "")
 			if err != nil {
-				return errors.Wrap(err, "could not gather priviate key file for proxy from: "+p.adapterPrivKeyFile)
+				return errors.Wrap(err, "could not gather private key file for proxy from: "+p.adapterPrivKeyFile)
 			}
 			assetConfig.Credentials = append(assetConfig.Credentials, cred)
 		} else if len(p.buildInfo.SSHPrivateKey) > 0 {
-			cred := vault.NewPrivateKeyCredential(p.config.User, []byte(p.buildInfo.SSHPrivateKey), "")
+			cred := vault.NewPrivateKeyCredential(p.buildInfo.User, []byte(p.buildInfo.SSHPrivateKey), "")
 			assetConfig.Credentials = append(assetConfig.Credentials, cred)
 		} else {
 			// fallback to password auth
