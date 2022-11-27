@@ -374,7 +374,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	} else if p.buildInfo.ConnType == "winrm" {
 		ui.Message("detected packer build via winrm")
 		assetConfig.Backend = providers.ProviderType_WINRM
-		assetConfig.Host = fmt.Sprintf("%s:%d", p.buildInfo.Host, p.buildInfo.Port)
+		assetConfig.Host = p.buildInfo.Host
+		assetConfig.Port = int32(p.buildInfo.Port)
 		assetConfig.Insecure = true // we do not check the hostkey for the packer build
 		cred := vault.NewPasswordCredential(p.buildInfo.User, p.buildInfo.Password)
 		assetConfig.Credentials = append(assetConfig.Credentials, cred)
