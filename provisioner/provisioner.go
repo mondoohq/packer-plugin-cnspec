@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"go.mondoo.com/cnquery/logger"
 	"log"
 	"net"
 	"os"
@@ -190,7 +191,7 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 }
 
 func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.Communicator, generatedData map[string]interface{}) error {
-	ui.Say("Running Mondoo cnspec packer provisioner (Version: " + version.Version + ", Build: " + version.Build + ")")
+	ui.Say("Running cnspec packer provisioner by Mondoo (Version: " + version.Version + ", Build: " + version.Build + ")")
 
 	err := mapstructure.Decode(generatedData, &p.buildInfo)
 	if err != nil {
@@ -382,6 +383,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	} else if p.buildInfo.ConnType == "docker" {
 		ui.Message("detected packer container image build")
 		assetConfig.Backend = providers.ProviderType_DOCKER
+		// buildInfo.ID containers the docker container image id
 		assetConfig.Host = fmt.Sprintf("%s", p.buildInfo.ID)
 	} else {
 		ui.Message("detected packer build via unknown connection type: " + p.buildInfo.ConnType)
@@ -429,9 +431,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		ReportType:    scan.ReportType_FULL,
 	}
 
+	debugLogBuffer := &bytes.Buffer{}
+	logger.SetWriter(debugLogBuffer)
 	if p.config.Debug {
 		data, _ := json.Marshal(scanJob)
-		ui.Message(fmt.Sprintf("mondoo configuration: %v", string(data)))
+		ui.Message(fmt.Sprintf("cnspec job configuration: %v", string(data)))
+
+		// configure stderr logger
+		logger.Set("debug")
 	}
 
 	// base 64 config env setting has always precedence
@@ -446,8 +453,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 		viper.ReadConfig(bytes.NewBuffer(decodedData))
 	} else {
-		// load first config we find (MONDOO_CONFIG_PATH, home directory, system directory)
+		// load first config we find in the following order:
+		// MondooConfigPath from config, MONDOO_CONFIG_PATH, home directory, system directory
 		paths := []string{}
+
+		if p.config.MondooConfigPath != "" {
+			paths = append(paths, p.config.MondooConfigPath)
+		}
+
 		if path := os.Getenv("MONDOO_CONFIG_PATH"); len(path) > 0 {
 			paths = append(paths, path)
 		}
@@ -519,9 +532,11 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		serviceAccount := cfg.GetServiceCredential()
 		if serviceAccount != nil {
 			ui.Message("using service account credentials")
+			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn()))
 			certAuth, _ := upstream.NewServiceAccountRangerPlugin(serviceAccount)
 			plugins := []ranger.ClientPlugin{certAuth}
-			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn(), plugins))
+			scannerOpts = append(scannerOpts, scan.WithPlugins(plugins))
+
 		}
 
 		ui.Message("scan packer build")
@@ -529,6 +544,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		result, err = scanService.Run(context.Background(), scanJob)
 		if err != nil {
 			ui.Error("scan failed: " + err.Error())
+			// log output for debug/error logs
+			ui.Error(debugLogBuffer.String())
 			return err
 		}
 	}
