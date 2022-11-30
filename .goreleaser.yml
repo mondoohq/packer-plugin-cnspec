@@ -34,13 +34,22 @@ builds:
       - -s -w -X go.mondoo.com/packer-plugin-mondoo/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-mondoo/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-mondoo/version.Date={{.Date}}
 
 archives:
-  - id: releases
-    name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+  - id: releases-packer-plugin-cnspec
+    builds:
+      - packer-plugin-cnspec
+    name_template: 'packer-plugin-cnspec_{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+    format: zip
+    files:
+      - none*
+  - id: releases-packer-plugin-mondoo
+    builds:
+      - packer-plugin-mondoo
+    name_template: 'packer-plugin-mondoo_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     format: zip
     files:
       - none*
 checksum:
-  name_template: '{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS'
+  name_template: 'packer-plugin-cnspec_v{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 snapshot:
   name_template: "{{ .Tag }}-snapshot"
