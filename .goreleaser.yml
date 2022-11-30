@@ -8,7 +8,9 @@ before:
     # Check plugin compatibility with required version of the Packer SDK
     - make plugin-check
 builds:
-  - binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+  # building the new packer-plugin-cnspec
+  - id: packer-plugin-cnspec
+    binary: 'packer-plugin-cnspec_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     goos:
       - darwin
       - linux
@@ -18,6 +20,19 @@ builds:
       - arm64
     ldflags:
       - -s -w -X go.mondoo.com/packer-plugin-mondoo/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-mondoo/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-mondoo/version.Date={{.Date}}
+  # building fall-back binaries
+  - id: packer-plugin-mondoo
+    binary: 'packer-plugin-mondoo_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X go.mondoo.com/packer-plugin-mondoo/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-mondoo/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-mondoo/version.Date={{.Date}}
+
 archives:
   - id: releases
     name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
