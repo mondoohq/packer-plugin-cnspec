@@ -4,24 +4,19 @@ package provisioner
 //go:generate packer-sdc struct-markdown
 
 import (
-	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
+	"go.mondoo.com/cnquery/logger"
 	"log"
 	"net"
 	"os"
-	"os/exec"
 	"os/user"
 	"strconv"
-	"strings"
-	"sync"
-	"unicode"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-sdk/adapter"
 	"github.com/hashicorp/packer-plugin-sdk/common"
@@ -29,7 +24,20 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/afero"
+	"github.com/spf13/viper"
+	config_loader "go.mondoo.com/cnquery/cli/config"
+	"go.mondoo.com/cnquery/motor/asset"
+	inventory "go.mondoo.com/cnquery/motor/inventory/v1"
+	"go.mondoo.com/cnquery/motor/providers"
+	"go.mondoo.com/cnquery/motor/vault"
+	"go.mondoo.com/cnquery/upstream"
+	cnspec_config "go.mondoo.com/cnspec/apps/cnspec/cmd/config"
+	"go.mondoo.com/cnspec/cli/reporter"
+	"go.mondoo.com/cnspec/policy"
+	"go.mondoo.com/cnspec/policy/scan"
 	"go.mondoo.com/packer-plugin-mondoo/version"
+	"go.mondoo.com/ranger-rpc"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -67,8 +75,6 @@ type Config struct {
 	// The asset name passed to Mondoo Platform. Defaults to the hostname
 	// of the instance.
 	AssetName string `mapstructure:"asset_name"`
-	// Array of environment variables for configuring Mondoo.
-	MondooEnvVars []string `mapstructure:"mondoo_env_vars"`
 	// Configure behavior whether packer should fail if `scan_threshold` is
 	// not met. If `scan_threshold` configuration is omitted, the threshold
 	// is set to `0` and builds will pass regardless of what score is
@@ -161,27 +167,16 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 		}
 	}
 
-	// ensure that we disable ssh auth, since the packer proxy only allows one auth mechanism
-	p.config.MondooEnvVars = append(p.config.MondooEnvVars, "SSH_AUTH_SOCK=")
-
-	if !p.config.UseSFTP {
-		p.config.MondooEnvVars = append(p.config.MondooEnvVars, "MONDOO_SSH_SCP=on")
-	}
-
-	if p.config.Debug {
-		p.config.MondooEnvVars = append(p.config.MondooEnvVars, "DEBUG=1")
-	}
-
 	if p.config.LocalPort > 65535 {
 		errs = packer.MultiErrorAppend(errs, fmt.Errorf("local_port: %d must be a valid port", p.config.LocalPort))
 	}
 
 	if p.config.User == "" {
-		usr, err := user.Current()
+		userName, err := user.Current()
 		if err != nil {
 			errs = packer.MultiErrorAppend(errs, err)
 		} else {
-			p.config.User = usr.Username
+			p.config.User = userName.Username
 		}
 	}
 	if p.config.User == "" {
@@ -196,7 +191,7 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 }
 
 func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.Communicator, generatedData map[string]interface{}) error {
-	ui.Say("Running Mondoo packer provisioner (Version: " + version.Version + ", Build: " + version.Build + ")")
+	ui.Say("Running cnspec packer provisioner by Mondoo (Version: " + version.Version + ", Build: " + version.Build + ")")
 
 	err := mapstructure.Decode(generatedData, &p.buildInfo)
 	if err != nil {
@@ -209,12 +204,12 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 		if err != nil {
 			return err
 		}
-		ui.Say(string(data))
+		ui.Message("build info: " + string(data))
 	}
 
 	// configure ssh proxy
 	if p.config.UseProxy {
-		ui.Say("configure ssh proxy")
+		ui.Message("configure ssh proxy")
 		k, err := newUserKey(p.config.SSHAuthorizedKeyFile)
 		if err != nil {
 			return err
@@ -233,8 +228,8 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 
 		keyChecker := ssh.CertChecker{
 			UserKeyFallback: func(conn ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
-				if user := conn.User(); user != p.config.User {
-					return nil, fmt.Errorf("authentication failed: %s is not a valid user", user)
+				if userName := conn.User(); userName != p.config.User {
+					return nil, fmt.Errorf("authentication failed: %s is not a valid user", userName)
 				}
 
 				if !bytes.Equal(k.Marshal(), pubKey.Marshal()) {
@@ -245,17 +240,16 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 			},
 		}
 
-		config := &ssh.ServerConfig{
+		proxyConfig := &ssh.ServerConfig{
 			AuthLogCallback: func(conn ssh.ConnMetadata, method string, err error) {
 				log.Printf("ssh proxy authentication attempt from %s to %s as %s using %s", conn.RemoteAddr(), conn.LocalAddr(), conn.User(), method)
 			},
 			PublicKeyCallback: keyChecker.Authenticate,
 		}
 
-		config.AddHostKey(hostSigner)
+		proxyConfig.AddHostKey(hostSigner)
 
 		localListener, err := func() (net.Listener, error) {
-
 			port := p.config.LocalPort
 			tries := 1
 			if port != 0 {
@@ -283,13 +277,12 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 			}
 			return nil, errors.New("error setting up SSH proxy connection")
 		}()
-
 		if err != nil {
 			return err
 		}
 
 		// initialize ssh adapter
-		p.adapter = adapter.NewAdapter(p.done, localListener, config, "sftp -e", ui, comm)
+		p.adapter = adapter.NewAdapter(p.done, localListener, proxyConfig, "sftp -e", ui, comm)
 		defer func() {
 			ui.Say("shutting down the SSH proxy")
 			close(p.done)
@@ -303,8 +296,8 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 		Ui:  ui,
 	}
 
-	// run mondoo policies
-	err = p.executeMondoo(ctx, ui, comm)
+	// run policies
+	err = p.executeCnspec(ui, comm)
 	if err != nil {
 		ui.Error(err.Error())
 	}
@@ -332,107 +325,82 @@ func (p *Provisioner) ConfigSpec() hcldec.ObjectSpec {
 	return p.config.FlatMapstructure().HCL2Spec()
 }
 
-func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm packer.Communicator) error {
-	var envvars []string
+func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) error {
 
-	if len(p.config.MondooEnvVars) > 0 {
-		envvars = append(envvars, p.config.MondooEnvVars...)
+	assetConfig := &providers.Config{
+		Backend: providers.ProviderType_UNKNOWN,
+		Options: map[string]string{},
 	}
 
-	// Always available Packer provided env vars
-	p.config.MondooEnvVars = append(p.config.MondooEnvVars, fmt.Sprintf("PACKER_BUILD_NAME=%s", p.config.PackerBuildName))
-	p.config.MondooEnvVars = append(p.config.MondooEnvVars, fmt.Sprintf("PACKER_BUILDER_TYPE=%s", p.config.PackerBuilderType))
-
-	cmdargs := []string{"scan"}
-
-	connType := "local"
-	var endpoint string
-	var user string
-	var password string
-	var privKeyFile string
+	if p.config.Sudo != nil && p.config.Sudo.Active {
+		ui.Message("activated sudo")
+		assetConfig.Sudo = &providers.Sudo{
+			Active: p.config.Sudo.Active,
+		}
+	}
 
 	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" {
-		connType = "ssh"
-		endpoint = fmt.Sprintf("%s:%d", p.buildInfo.Host, p.buildInfo.Port)
-		user = p.buildInfo.User
-		password = p.buildInfo.Password
-		// if we get a private key, cache that key locally
-		if len(p.buildInfo.SSHPrivateKey) > 0 {
-			tmpfile, err := ioutil.TempFile("", "packer")
-			if err != nil {
-				return err
-			}
-			// clean up ssh key after scan
-			defer os.Remove(tmpfile.Name())
+		ui.Message("detected packer build via ssh")
+		assetConfig.Backend = providers.ProviderType_SSH
+		assetConfig.Host = p.buildInfo.Host
+		assetConfig.Port = int32(p.buildInfo.Port)
+		assetConfig.Insecure = true // we do not check the hostkey for the packer build
+		assetConfig.Credentials = []*vault.Credential{}
 
-			if _, err := tmpfile.Write([]byte(p.buildInfo.SSHPrivateKey)); err != nil {
-				return err
-			}
-			if err := tmpfile.Close(); err != nil {
-				return err
-			}
-			privKeyFile = tmpfile.Name()
+		if !p.config.UseSFTP {
+			assetConfig.Options["ssh_scp"] = "on"
 		}
 
 		// use proxy
 		if p.config.UseProxy {
-			ui.Say("use packer's ssh proxy")
-			endpoint = fmt.Sprintf("%s:%d", "127.0.0.1", p.config.LocalPort)
-			privKeyFile = p.adapterPrivKeyFile
-			user = p.config.User
-			password = ""
+			ui.Message("use packer's ssh proxy")
+			// overwrite host since we go via the proxy now
+			assetConfig.Host = "127.0.0.1"
+			assetConfig.Port = int32(p.config.LocalPort)
+
+			// NOTE: packer proxy only allows one auth mechanism
+			cred, err := vault.NewPrivateKeyCredentialFromPath(p.config.User, p.adapterPrivKeyFile, "")
+			if err != nil {
+				return errors.Wrap(err, "could not gather private key file for proxy from: "+p.adapterPrivKeyFile)
+			}
+			assetConfig.Credentials = append(assetConfig.Credentials, cred)
+		} else if len(p.buildInfo.SSHPrivateKey) > 0 {
+			cred := vault.NewPrivateKeyCredential(p.buildInfo.User, []byte(p.buildInfo.SSHPrivateKey), "")
+			assetConfig.Credentials = append(assetConfig.Credentials, cred)
+		} else {
+			// fallback to password auth
+			cred := vault.NewPasswordCredential(p.buildInfo.User, p.buildInfo.Password)
+			assetConfig.Credentials = append(assetConfig.Credentials, cred)
 		}
 	} else if p.buildInfo.ConnType == "winrm" {
-		connType = "winrm"
-		endpoint = fmt.Sprintf("%s:%d", p.buildInfo.Host, p.buildInfo.Port)
-		user = p.buildInfo.User
-		password = p.buildInfo.Password
+		ui.Message("detected packer build via winrm")
+		assetConfig.Backend = providers.ProviderType_WINRM
+		assetConfig.Host = p.buildInfo.Host
+		assetConfig.Port = int32(p.buildInfo.Port)
+		assetConfig.Insecure = true // we do not check the hostkey for the packer build
+		cred := vault.NewPasswordCredential(p.buildInfo.User, p.buildInfo.Password)
+		assetConfig.Credentials = append(assetConfig.Credentials, cred)
 	} else if p.buildInfo.ConnType == "docker" {
-		connType = "docker"
-		endpoint = fmt.Sprintf("%s", p.buildInfo.ID)
-		ui.Say(endpoint)
+		ui.Message("detected packer container image build")
+		assetConfig.Backend = providers.ProviderType_DOCKER
+		// buildInfo.ID containers the docker container image id
+		assetConfig.Host = fmt.Sprintf("%s", p.buildInfo.ID)
 	} else {
+		ui.Message("detected packer build via unknown connection type: " + p.buildInfo.ConnType)
 		return errors.New("unsupported connection type: " + p.buildInfo.ConnType)
 	}
-	// mondoo scan local or mondoo scan ssh ec2-user@3.219.56.31 or mondoo scan winrm ec2-user@3.219.56.31
-	cmdargs = append(cmdargs, connType)
-	if connType == "ssh" || connType == "winrm" {
-		cmdargs = append(cmdargs, fmt.Sprintf("%s@%s", user, endpoint))
-	}
 
-	if connType == "docker" {
-		cmdargs = append(cmdargs, endpoint)
-	}
+	var policyBundle *policy.Bundle
+	var policyFilters []string
 
 	if p.config.PolicyBundle != "" {
-		cmdargs = append(cmdargs, "--policy-bundle "+p.config.PolicyBundle)
-	}
-
-	if p.config.Output != "" {
-		cmdargs = append(cmdargs, []string{"--output", p.config.Output}...)
-	}
-
-	if password != "" {
-		cmdargs = append(cmdargs, []string{"--password", password}...)
-	}
-
-	if privKeyFile != "" {
-		cmdargs = append(cmdargs, []string{"--identity-file", privKeyFile}...)
-	}
-
-	if p.config.OnFailure == "continue" {
-		// ignore the result of the scan
-		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(0)}...)
-	} else if p.config.ScoreThreshold != 0 {
-		// user overwrite the default score threshold
-		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(p.config.ScoreThreshold)}...)
-	} else {
-		// expects all controls to pass
-		cmdargs = append(cmdargs, []string{"--score-threshold", strconv.Itoa(100)}...)
-	}
-
-	if p.config.MondooConfigPath != "" {
-		cmdargs = append(cmdargs, []string{"--config", p.config.MondooConfigPath}...)
+		ui.Message("load policy bundle from: " + p.config.PolicyBundle)
+		var err error
+		policyBundle, err = policy.BundleFromPaths(p.config.PolicyBundle)
+		if err != nil {
+			return errors.Wrap(err, "could not load policy bundle from "+p.config.PolicyBundle)
+		}
+		policyFilters = policyBundle.PolicyMRNs()
 	}
 
 	// If annotations are not specified, this will error out so make sure to init the map.
@@ -444,107 +412,179 @@ func (p *Provisioner) executeMondoo(ctx context.Context, ui packer.Ui, comm pack
 	for k := range p.config.Labels {
 		p.config.Annotations[k] = p.config.Labels[k]
 	}
+
 	// build configuration
-	connection := fmt.Sprintf("%s://%s", connType, endpoint)
-	if user != "" {
-		connection = fmt.Sprintf("%s://%s@%s", connType, user, endpoint)
-	}
-
-	conf := &VulnOpts{
-		Assets: []*Asset{
-			{
-				Name:         p.config.AssetName,
-				Connection:   connection,
-				IdentityFile: privKeyFile,
-				Password:     password,
-				Annotations:  p.config.Annotations,
-			},
+	conf := inventory.New(inventory.WithAssets(&asset.Asset{
+		Name:        p.config.AssetName,
+		Connections: []*providers.Config{assetConfig},
+		Annotations: p.config.Annotations,
+		Labels: map[string]string{
+			"packer.io/buildname": p.config.PackerBuildName,
+			"packer.io/buildtype": p.config.PackerBuilderType,
 		},
-		Insecure: true, // we do not check the hostkey for the packer build
+	}))
+
+	scanJob := &scan.Job{
+		Inventory:     conf,
+		Bundle:        policyBundle,
+		PolicyFilters: policyFilters,
+		ReportType:    scan.ReportType_FULL,
 	}
 
-	if p.config.Sudo != nil && p.config.Sudo.Active {
-		ui.Say("activated sudo")
-		conf.Sudo = VulnOptsSudo{
-			Active: p.config.Sudo.Active,
-		}
-	}
-
-	// pass incognito to mondoo scan
-	conf.Incognito = p.config.Incognito
-
-	// pass policies into mondoo config
-	conf.Policies = p.config.Policies
-
-	// prep config for mondoo executable
-	mondooScanConf, err := json.Marshal(conf)
-
-	if err != nil {
-		return err
-	}
-
+	debugLogBuffer := &bytes.Buffer{}
+	logger.SetWriter(debugLogBuffer)
 	if p.config.Debug {
-		ui.Say(fmt.Sprintf("mondoo configuration: %v", string(mondooScanConf)))
+		data, _ := json.Marshal(scanJob)
+		ui.Message(fmt.Sprintf("cnspec job configuration: %v", string(data)))
+
+		// configure stderr logger
+		logger.Set("debug")
 	}
 
-	cmd := exec.Command(p.config.Command, cmdargs...)
-
-	cmd.Env = os.Environ()
-	if len(envvars) > 0 {
-		cmd.Env = append(cmd.Env, envvars...)
-	}
-	cmd.Env = append(cmd.Env, "CI=true")
-	cmd.Env = append(cmd.Env, "PACKER_PIPELINE=true")
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return err
-	}
-	stdin.Write(mondooScanConf)
-	stdin.Close()
-
-	wg := sync.WaitGroup{}
-	repeat := func(r io.ReadCloser) {
-		reader := bufio.NewReader(r)
-		for {
-			line, err := reader.ReadString('\n')
-			if line != "" {
-				line = strings.TrimRightFunc(line, unicode.IsSpace)
-				ui.Message(line)
-			}
-			if err != nil {
-				if err == io.EOF {
-					break
-				} else {
-					ui.Error(err.Error())
-					break
-				}
-			}
+	// base 64 config env setting has always precedence
+	viper.SetConfigType("yaml")
+	if value := os.Getenv("MONDOO_CONFIG_BASE64"); len(value) > 0 {
+		ui.Message("load config from detected MONDOO_CONFIG_BASE64")
+		decodedData, err := base64.StdEncoding.DecodeString(value)
+		if err != nil {
+			wErr := errors.Wrap(err, "cannot parse config from MONDOO_CONFIG_BASE64")
+			ui.Error(wErr.Error())
+			return wErr
 		}
-		wg.Done()
-	}
-	wg.Add(2)
-	go repeat(stdout)
-	go repeat(stderr)
+		viper.ReadConfig(bytes.NewBuffer(decodedData))
+	} else {
+		// load first config we find in the following order:
+		// MondooConfigPath from config, MONDOO_CONFIG_PATH, home directory, system directory
+		paths := []string{}
 
-	ui.Say(fmt.Sprintf("Executing Mondoo: %s", cmd.Args))
-	if err := cmd.Start(); err != nil {
+		if p.config.MondooConfigPath != "" {
+			paths = append(paths, p.config.MondooConfigPath)
+		}
+
+		if path := os.Getenv("MONDOO_CONFIG_PATH"); len(path) > 0 {
+			paths = append(paths, path)
+		}
+
+		config_loader.AppFs = afero.NewOsFs() // TODO fix in config_loader package, this should not be here
+		homeConfig, exists, err := config_loader.HomePath()
+		if err == nil && exists {
+			paths = append(paths, homeConfig)
+		}
+
+		if path, ok := config_loader.SystemPath(); ok {
+			paths = append(paths, path)
+		}
+
+		foundConfig := false
+		for i := range paths {
+			path := paths[i]
+			if path == "" {
+				continue
+			}
+
+			_, err := os.Stat(path)
+			if err != nil {
+				continue
+			}
+
+			ui.Message("load config from detected " + path)
+			data, err := os.ReadFile(path)
+			if err != nil {
+				wErr := errors.Wrap(err, "cannot parse config from "+path)
+				ui.Error(wErr.Error())
+				return wErr
+			}
+			err = viper.ReadConfig(bytes.NewBuffer(data))
+			if err != nil {
+				wErr := errors.Wrap(err, "cannot parse config from "+path)
+				ui.Error(wErr.Error())
+				return wErr
+			}
+
+			foundConfig = true
+			break
+		}
+
+		if !foundConfig {
+			ui.Message("no configuration provided")
+			p.config.Incognito = true
+		}
+	}
+
+	var result *scan.ScanResult
+	var err error
+	if p.config.Incognito {
+		ui.Message("scan packer build in incognito mode")
+		scanService := scan.NewLocalScanner()
+		result, err = scanService.RunIncognito(context.Background(), scanJob)
+		if err != nil {
+			return err
+		}
+	} else {
+		cfg, err := cnspec_config.ReadConfig()
+		if err != nil {
+			wErr := errors.Wrap(err, "could not parse cnspec configuration")
+			ui.Error(wErr.Error())
+			return wErr
+		}
+
+		var scannerOpts []scan.ScannerOption
+		serviceAccount := cfg.GetServiceCredential()
+		if serviceAccount != nil {
+			ui.Message("using service account credentials")
+			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn()))
+			certAuth, _ := upstream.NewServiceAccountRangerPlugin(serviceAccount)
+			plugins := []ranger.ClientPlugin{certAuth}
+			scannerOpts = append(scannerOpts, scan.WithPlugins(plugins))
+
+		}
+
+		ui.Message("scan packer build")
+		scanService := scan.NewLocalScanner(scannerOpts...)
+		result, err = scanService.Run(context.Background(), scanJob)
+		if err != nil {
+			ui.Error("scan failed: " + err.Error())
+			// log output for debug/error logs
+			ui.Error(debugLogBuffer.String())
+			return err
+		}
+	}
+
+	ui.Message("scan completed successfully")
+
+	// render terminal output
+	output := p.config.Output
+	r, err := reporter.New(output)
+	if err != nil {
 		return err
 	}
-	wg.Wait()
-	err = cmd.Wait()
+	r.IsIncognito = p.config.Incognito
 
+	fullReport := result.GetFull()
+	if fullReport == nil {
+		rErr := errors.New("could not gather the full report")
+		ui.Error(rErr.Error())
+		return rErr
+	}
+	buf := &bytes.Buffer{}
+	err = r.Print(fullReport, buf)
 	if err != nil {
-		return fmt.Errorf("non-zero exit status: %s", err)
+		return err
+	}
+	ui.Message(buf.String())
+
+	// default is to pass all controls
+	scoreThreshold := 100
+	if p.config.OnFailure == "continue" {
+		// ignore the result of the scan
+		scoreThreshold = 0
+	} else if p.config.ScoreThreshold != 0 {
+		// user overwrite the default score threshold
+		scoreThreshold = p.config.ScoreThreshold
+	}
+
+	if fullReport.GetWorstScore() < uint32(scoreThreshold) {
+		return fmt.Errorf("scan has completed with %d score, does not pass score threshold %d", fullReport.GetWorstScore(), scoreThreshold)
 	}
 
 	return nil

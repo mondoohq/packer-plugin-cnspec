@@ -27,7 +27,6 @@ type FlatConfig struct {
 	UseSFTP              *bool             `mapstructure:"use_sftp" cty:"use_sftp" hcl:"use_sftp"`
 	Debug                *bool             `mapstructure:"debug" cty:"debug" hcl:"debug"`
 	AssetName            *string           `mapstructure:"asset_name" cty:"asset_name" hcl:"asset_name"`
-	MondooEnvVars        []string          `mapstructure:"mondoo_env_vars" cty:"mondoo_env_vars" hcl:"mondoo_env_vars"`
 	OnFailure            *string           `mapstructure:"on_failure" cty:"on_failure" hcl:"on_failure"`
 	Labels               map[string]string `mapstructure:"labels" cty:"labels" hcl:"labels"`
 	Annotations          map[string]string `mapstructure:"annotations" cty:"annotations" hcl:"annotations"`
@@ -72,7 +71,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"use_sftp":                   &hcldec.AttrSpec{Name: "use_sftp", Type: cty.Bool, Required: false},
 		"debug":                      &hcldec.AttrSpec{Name: "debug", Type: cty.Bool, Required: false},
 		"asset_name":                 &hcldec.AttrSpec{Name: "asset_name", Type: cty.String, Required: false},
-		"mondoo_env_vars":            &hcldec.AttrSpec{Name: "mondoo_env_vars", Type: cty.List(cty.String), Required: false},
 		"on_failure":                 &hcldec.AttrSpec{Name: "on_failure", Type: cty.String, Required: false},
 		"labels":                     &hcldec.AttrSpec{Name: "labels", Type: cty.Map(cty.String), Required: false},
 		"annotations":                &hcldec.AttrSpec{Name: "annotations", Type: cty.Map(cty.String), Required: false},

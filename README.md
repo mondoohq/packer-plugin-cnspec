@@ -1,14 +1,9 @@
-# Packer Plugin Mondoo
+# Packer Plugin for Mondoo cnspec
 
-`Mondoo` scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of certified security policies which can be easily customize to meet your needs. 
+Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
+cnspec supports scanning of Linux, Windows, and macOS, as well as Docker containers.
 
-Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
-
-## Get Started with Mondoo
-
-If you are new to Mondoo you can get started by [signing up for a free account](https://mondoo.com/docs/tutorials/mondoo/account-setup/) today!
-
-## Packer Plugin Mondoo tutorial
+## Get Started
 
 Check out the [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) tutorial on the Mondoo documentation site.
 
@@ -23,7 +18,7 @@ To install this plugin, copy and paste this code into your Packer configuration 
 packer {
   required_plugins {
     mondoo = {
-      version = ">= 0.4.0"
+      version = ">= 0.6.0"
       source  = "github.com/mondoohq/mondoo"
     }
   }
@@ -41,6 +36,8 @@ Once you have downloaded the latest archive corresponding to your target OS, unc
 
 If you prefer to build the plugin from sources, clone the GitHub repository locally and run the command `go build` from the root directory. Upon successful compilation, a `packer-plugin-mondoo` plugin binary file can be found in the root directory. To install the compiled plugin, please follow the official Packer documentation on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
+By using `make dev`, the binary is copied into `~/.packer.d/plugins/` after the build.
+
 ## Configuration
 
 | **Name** | **Description** | **Type** | **Default** | **Required** |
@@ -56,19 +53,17 @@ If you prefer to build the plugin from sources, clone the GitHub repository loca
 ### Example: Complete Configuration
 
 ```hcl
-  provisioner "mondoo" {
-    on_failure      = "continue"
-    mondoo_config_path = "/etc/mondoo-config.json"
-    score_threshold = 85
-    asset_name      = "example-secure-base-image"
-    sudo {
-      active = true
-    }
+provisioner "mondoo" {
+  on_failure      = "continue"
+  score_threshold = 85
+  asset_name      = "example-secure-base-image"
+  sudo {
+    active = true
+  }
 
-    annotations = {
-      Source_AMI    = "{{ .SourceAMI }}"
-      Creation_Date = "{{ .SourceAMICreationDate }}"
-    }
+  annotations = {
+    Source_AMI    = "{{ .SourceAMI }}"
+    Creation_Date = "{{ .SourceAMICreationDate }}"
   }
 }
 ```
@@ -76,6 +71,10 @@ If you prefer to build the plugin from sources, clone the GitHub repository loca
 ## Sample Packer Templates
 
 You can find example Packer templates in the [examples](/examples/) directory in this repository.
+
+## Get Started with cnspec
+
+If you want to use cnspec outside of packer, you can [get started](https://mondoo.com/docs/cnspec/) today!
 
 ## Contributing
 
