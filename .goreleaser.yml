@@ -37,7 +37,7 @@ archives:
   - id: releases-packer-plugin-cnspec
     builds:
       - packer-plugin-cnspec
-    name_template: 'packer-plugin-cnspec_{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+    name_template: 'packer-plugin-cnspec_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     format: zip
     files:
       - none*
