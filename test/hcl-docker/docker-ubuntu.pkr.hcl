@@ -5,7 +5,7 @@ packer {
       source  = "github.com/hashicorp/docker"
     }
     mondoo = {
-      version = ">= 0.2.1"
+      version = ">= 0.6.0"
       source  = "github.com/mondoohq/mondoo"
     }
   }
