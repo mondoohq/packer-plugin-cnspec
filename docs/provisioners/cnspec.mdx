@@ -1,0 +1,47 @@
+---
+description: |
+    The cnspec packer provisioner by Mondoo scans machine-image builds for vulnerabilities
+    and misconfigurations by executing security policies-as-code.
+page_title: cnspec - Provisioner
+sidebar_title: cnspec
+---
+
+# cnspec Provisioner
+
+Type: `cnspec`
+
+Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows machine images for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
+
+## Basic Example
+```hcl
+provisioner "cnspec" {
+  on_failure          = "continue"
+  score_threshold     = 85
+  sudo {
+    active = true
+  }
+}
+```
+
+## Configuration Reference
+
+Optional Parameters:
+@include '/provisioner/Config-not-required.mdx'
+
+### SudoConfig
+@include '/provisioner/SudoConfig-not-required.mdx'
+
+## Get Started with cnspec
+
+If you are new to cnspec, check out [Get started with cnspec](https://mondoo.com/docs/cnspec/).
+
+## Packer plugin cnspec tutorial
+
+Check out the Packer tutorials on the Mondoo documentation site:
+
+- [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) 
+- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/tutorials/gcp/build-secure-gcp-vm-images-packer/) 
+
+## Sample Packer Templates
+
+You can find example Packer templates in the [examples](https://github.com/mondoohq/packer-plugin-cnspec/tree/main/examples) directory in this repository.
