@@ -1,11 +1,22 @@
 # Packer Plugin for Mondoo cnspec
 
-Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
-cnspec supports scanning of Linux, Windows, and macOS, as well as Docker containers.
+Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. cnspec supports scanning of Linux, Windows, and macOS, as well as Docker containers.
 
-## Get Started
+## Plugin modes
 
-Check out the [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) tutorial on the Mondoo documentation site.
+Packer plugin cnspec is designed to work in one of two modes:
+
+- **Unregistered** - In unregistered mode, the plugin works without being registered to Mondoo Platform, and is designed to provide baseline security scanning with minimal configuration. The plugin runs either the [Linux Security by Mondoo](https://github.com/mondoohq/cnspec-policies/blob/main/core/mondoo-linux-security.mql.yaml) policy on Linux builds, or the [Windows Security by Mondoo](https://github.com/mondoohq/cnspec-policies/blob/main/core/mondoo-windows-security.mql.yaml) policy on Windows builds. Each of these policies provides security hardening checks based off of industry standards for Linux and Windows. Scan results are shown in STDOUT during the Packer run.  
+- **Registered** - In registered mode, the plugin is registered to your account in Mondoo Platform using a service account. Registered mode allows you to configure and customize any of the policies in Mondoo Platform including CIS benchmarks and more. Scan results are shown in STDOUT and sent back to Mondoo Platform for your records.
+
+
+
+## Tutorials
+
+Check out the Packer tutorials on the Mondoo documentation site:
+
+- [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) 
+- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/tutorials/gcp/build-secure-gcp-vm-images-packer/) 
 
 # Installation
 
@@ -17,9 +28,9 @@ To install this plugin, copy and paste this code into your Packer configuration 
 ```hcl
 packer {
   required_plugins {
-    mondoo = {
-      version = ">= 0.6.0"
-      source  = "github.com/mondoohq/mondoo"
+    cnspec = {
+      version = ">= 6.1.3"
+      source  = "github.com/mondoohq/cnspec"
     }
   }
 }
@@ -27,7 +38,7 @@ packer {
 
 #### Manual installation
 
-You can find pre-built binary releases of the plugin [here](https://github.com/mondoohq/packer-plugin-mondoo/releases).
+You can find pre-built binary releases of the plugin [here](https://github.com/mondoohq/packer-plugin-cnspec/releases).
 
 Once you have downloaded the latest archive corresponding to your target OS, uncompress it to retrieve the plugin binary file corresponding to your platform. To install the plugin, please follow the Packer documentation on
 [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
@@ -52,18 +63,12 @@ By using `make dev`, the binary is copied into `~/.packer.d/plugins/` after the 
 
 ### Example: Complete Configuration
 
-```hcl
-provisioner "mondoo" {
+```bash
+provisioner "cnspec" {
   on_failure      = "continue"
   score_threshold = 85
-  asset_name      = "example-secure-base-image"
   sudo {
     active = true
-  }
-
-  annotations = {
-    Source_AMI    = "{{ .SourceAMI }}"
-    Creation_Date = "{{ .SourceAMICreationDate }}"
   }
 }
 ```
