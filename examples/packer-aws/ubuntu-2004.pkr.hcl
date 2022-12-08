@@ -4,9 +4,9 @@ packer {
       version = ">= 1.1.0"
       source  = "github.com/hashicorp/amazon"
     }
-    mondoo = {
-      version = ">= 0.6.0"
-      source  = "github.com/mondoohq/mondoo"
+    cnspec = {
+      version = ">= 6.1.3"
+      source  = "github.com/mondoohq/cnspec"
     }
   }
 }

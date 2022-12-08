@@ -84,7 +84,7 @@
       "type": "shell"
     },
     {
-      "type": "mondoo",
+      "type": "cnspec",
       "asset_name": "my custom asset name",
       "on_failure": "continue"
     }

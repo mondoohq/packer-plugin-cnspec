@@ -5,9 +5,9 @@ packer {
       version = ">= 1.1.0"
       source  = "github.com/hashicorp/amazon"
     }
-    mondoo = {
-      version = ">= 0.6.0"
-      source  = "github.com/mondoohq/mondoo"
+    cnspec = {
+      version = ">= 6.1.3"
+      source  = "github.com/mondoohq/cnspec"
     }
   }
 }
@@ -67,7 +67,7 @@ build {
       "sudo yum upgrade -y"]
   }
 
-  provisioner "mondoo" {
+  provisioner "cnspec" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
     mondoo_config_path = "${var.mondoo_config_path}"

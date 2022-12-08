@@ -20,7 +20,7 @@
       ]
     },
     {
-      "type": "mondoo",
+      "type": "cnspec",
       "use_proxy": true,
       "incognito": true,
       "policybundle": "centos7-policy.yaml"

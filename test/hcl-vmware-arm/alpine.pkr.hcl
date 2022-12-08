@@ -70,7 +70,7 @@ build {
     ]
   }
 
-  provisioner "mondoo" {
+  provisioner "cnspec" {
     on_failure =  "continue"
 
     asset_name = "test-name"
