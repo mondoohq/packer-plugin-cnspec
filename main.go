@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/hashicorp/packer-plugin-sdk/plugin"
-	"go.mondoo.com/packer-plugin-mondoo/provisioner"
-	"go.mondoo.com/packer-plugin-mondoo/version"
+	"go.mondoo.com/packer-plugin-cnspec/provisioner"
+	"go.mondoo.com/packer-plugin-cnspec/version"
 )
 
 func main() {

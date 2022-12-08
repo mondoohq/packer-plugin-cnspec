@@ -36,7 +36,7 @@ import (
 	"go.mondoo.com/cnspec/cli/reporter"
 	"go.mondoo.com/cnspec/policy"
 	"go.mondoo.com/cnspec/policy/scan"
-	"go.mondoo.com/packer-plugin-mondoo/version"
+	"go.mondoo.com/packer-plugin-cnspec/version"
 	"go.mondoo.com/ranger-rpc"
 	"golang.org/x/crypto/ssh"
 )

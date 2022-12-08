@@ -32,14 +32,14 @@ case "$(uname -m)" in
 esac
 
 # automatic download of latest version
-version=$(curl https://api.github.com/repos/mondoohq/packer-plugin-mondoo/releases/latest | jq -r .name)
+version=$(curl https://api.github.com/repos/mondoohq/packer-plugin-cnspec/releases/latest | jq -r .name)
 # alternative set the version manually
 # version=v0.4.0
 
-archive="packer-plugin-mondoo_${version}_x5.0_${os}_${arch}.zip"
-sha="packer-plugin-mondoo_${version}_SHA256SUMS"
+archive="packer-plugin-cnspec_${version}_x5.0_${os}_${arch}.zip"
+sha="packer-plugin-cnspec_${version}_SHA256SUMS"
 echo Download "${archive}" from
-url="https://github.com/mondoohq/packer-plugin-mondoo/releases/download/${version}"
+url="https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${version}"
 echo "${url}"
 
 curl -sSL "${url}/${archive}" > "${archive}"
@@ -59,7 +59,7 @@ unzip "${archive}"
 rm "${archive}" "${sha}"
 
 mkdir -p ~/.packer.d/plugins
-mv "packer-plugin-mondoo_${version}_x5.0_${os}_${arch}" ~/.packer.d/plugins/packer-plugin-mondoo
+mv "packer-plugin-cnspec_${version}_x5.0_${os}_${arch}" ~/.packer.d/plugins/packer-plugin-cnspec
 echo "Marking executable..."
-chmod +x ~/.packer.d/plugins/packer-plugin-mondoo
+chmod +x ~/.packer.d/plugins/packer-plugin-cnspec
 

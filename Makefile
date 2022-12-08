@@ -1,4 +1,4 @@
-NAME=mondoo
+NAME=cnspec
 BINARY=packer-plugin-${NAME}
 
 COUNT?=1
@@ -8,7 +8,7 @@ HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/pac
 .PHONY: dev
 
 build:
-	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/packer-plugin-mondoo/version.Version=0.0.0 -X go.mondoo.com/packer-plugin-mondoo/version.Build=dev"
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/packer-plugin-cnspec/version.Version=0.0.0 -X go.mondoo.com/packer-plugin-cnspec/version.Build=dev"
 
 dev: build
 	@mkdir -p ~/.packer.d/plugins/
