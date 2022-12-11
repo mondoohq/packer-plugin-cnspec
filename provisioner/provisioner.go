@@ -439,6 +439,11 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 
 		// configure stderr logger
 		logger.Set("debug")
+
+		// log output for debug/error logs
+		defer func() {
+			ui.Message(debugLogBuffer.String())
+		}()
 	}
 
 	// base 64 config env setting has always precedence
@@ -546,8 +551,6 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		result, err = scanService.Run(context.Background(), scanJob)
 		if err != nil {
 			ui.Error("scan failed: " + err.Error())
-			// log output for debug/error logs
-			ui.Error(debugLogBuffer.String())
 			return err
 		}
 	}
