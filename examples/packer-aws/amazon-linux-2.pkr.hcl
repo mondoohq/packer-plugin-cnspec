@@ -23,12 +23,6 @@ variable "image_prefix" {
   default = "mondoo-amazon-linux-2-secure-base"
 }
 
-variable "mondoo_config_path" {
-  type = string
-  description = "The path to the config to be used when scanning"
-  default = ""
-}
-
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 source "amazon-ebs" "amazon2" {
@@ -70,7 +64,6 @@ build {
   provisioner "cnspec" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
-    mondoo_config_path = "${var.mondoo_config_path}"
     annotations = {
       Source_AMI    = "{{ .SourceAMI }}"
       Creation_Date = "{{ .SourceAMICreationDate }}"

@@ -15,12 +15,6 @@ variable "zone" {
   default = "us-east5-a"
 }
 
-variable "mondoo_config_path" {
-  type = string
-  description = "The path to the config to be used when scanning"
-  default = ""
-}
-
 variable "project_id" {
   type        = string
   description = "The project ID that will be used to launch instances and store images"
@@ -58,7 +52,6 @@ build {
   provisioner "mondoo" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
-    mondoo_config_path = "${var.mondoo_config_path}"
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"
     }
