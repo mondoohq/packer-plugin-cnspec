@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"go.mondoo.com/cnquery/logger"
 	"log"
 	"net"
 	"os"
@@ -27,6 +26,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 	config_loader "go.mondoo.com/cnquery/cli/config"
+	"go.mondoo.com/cnquery/logger"
 	"go.mondoo.com/cnquery/motor/asset"
 	inventory "go.mondoo.com/cnquery/motor/inventory/v1"
 	"go.mondoo.com/cnquery/motor/providers"
@@ -454,25 +454,27 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		viper.ReadConfig(bytes.NewBuffer(decodedData))
 	} else {
 		// load first config we find in the following order:
-		// MondooConfigPath from config, MONDOO_CONFIG_PATH, home directory, system directory
+		// 1. MONDOO_CONFIG_PATH env variable
+		// 2. MondooConfigPath from config
+		// 3. If no MondooConfigPath was set: home directory & system directory
 		paths := []string{}
-
-		if p.config.MondooConfigPath != "" {
-			paths = append(paths, p.config.MondooConfigPath)
-		}
 
 		if path := os.Getenv("MONDOO_CONFIG_PATH"); len(path) > 0 {
 			paths = append(paths, path)
 		}
 
-		config_loader.AppFs = afero.NewOsFs() // TODO fix in config_loader package, this should not be here
-		homeConfig, exists, err := config_loader.HomePath()
-		if err == nil && exists {
-			paths = append(paths, homeConfig)
-		}
+		if p.config.MondooConfigPath != "" {
+			paths = append(paths, p.config.MondooConfigPath)
+		} else {
+			config_loader.AppFs = afero.NewOsFs() // TODO fix in config_loader package, this should not be here
+			homeConfig, exists, err := config_loader.HomePath()
+			if err == nil && exists {
+				paths = append(paths, homeConfig)
+			}
 
-		if path, ok := config_loader.SystemPath(); ok {
-			paths = append(paths, path)
+			if path, ok := config_loader.SystemPath(); ok {
+				paths = append(paths, path)
+			}
 		}
 
 		foundConfig := false
