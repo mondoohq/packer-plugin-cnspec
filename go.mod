@@ -2,13 +2,13 @@ module go.mondoo.com/packer-plugin-cnspec
 
 require (
 	github.com/cockroachdb/errors v1.9.0
-	github.com/hashicorp/hcl/v2 v2.14.1
+	github.com/hashicorp/hcl/v2 v2.15.0
 	github.com/hashicorp/packer-plugin-sdk v0.3.2
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.12.1
 	go.mondoo.com/cnquery v0.0.0-20221211112857-6eceb5bb777c
 	go.mondoo.com/cnspec v0.0.0-20221211164043-d40a9f62192b
 	go.mondoo.com/ranger-rpc v0.5.1-0.20220923135836-9e7732899d34
