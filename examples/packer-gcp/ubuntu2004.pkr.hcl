@@ -4,21 +4,15 @@ packer {
       version = ">= 1.0.0"
       source  = "github.com/hashicorp/googlecompute"
     }
-    mondoo = {
-      version = ">= 0.6.0"
-      source  = "github.com/mondoohq/mondoo"
+    cnspec = {
+      version = ">= 6.1.3"
+      source  = "github.com/mondoohq/cnspec"
     }
   }
 }
 
 variable "zone" {
   default = "us-east5-a"
-}
-
-variable "mondoo_config_path" {
-  type = string
-  description = "The path to the config to be used when scanning"
-  default = ""
 }
 
 variable "project_id" {
@@ -58,7 +52,6 @@ build {
   provisioner "mondoo" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
-    mondoo_config_path = "${var.mondoo_config_path}"
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"
     }

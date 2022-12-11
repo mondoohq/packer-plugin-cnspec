@@ -60,7 +60,7 @@
       "type": "shell"
     },
     {
-      "type": "mondoo",
+      "type": "cnspec",
       "on_failure": "continue",
       "use_proxy": true
     }

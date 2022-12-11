@@ -5,9 +5,9 @@ packer {
       version = ">= 1.1.0"
       source  = "github.com/hashicorp/amazon"
     }
-    mondoo = {
-      version = ">= 0.6.0"
-      source  = "github.com/mondoohq/mondoo"
+    cnspec = {
+      version = ">= 6.1.3"
+      source  = "github.com/mondoohq/cnspec"
     }
   }
 }
@@ -21,12 +21,6 @@ variable "image_prefix" {
   type = string
   description = "Prefix to be applied to image name"
   default = "mondoo-amazon-linux-2-secure-base"
-}
-
-variable "mondoo_config_path" {
-  type = string
-  description = "The path to the config to be used when scanning"
-  default = ""
 }
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
@@ -67,10 +61,9 @@ build {
       "sudo yum upgrade -y"]
   }
 
-  provisioner "mondoo" {
+  provisioner "cnspec" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
-    mondoo_config_path = "${var.mondoo_config_path}"
     annotations = {
       Source_AMI    = "{{ .SourceAMI }}"
       Creation_Date = "{{ .SourceAMICreationDate }}"
