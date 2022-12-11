@@ -1,4 +1,4 @@
-module go.mondoo.com/packer-plugin-mondoo
+module go.mondoo.com/packer-plugin-cnspec
 
 require (
 	github.com/cockroachdb/errors v1.9.0
