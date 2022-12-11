@@ -45,7 +45,7 @@ Once you have downloaded the latest archive corresponding to your target OS, unc
 
 ### Build from source
 
-If you prefer to build the plugin from sources, clone the GitHub repository locally and run the command `go build` from the root directory. Upon successful compilation, a `packer-plugin-cnspec` plugin binary file can be found in the root directory. To install the compiled plugin, please follow the official Packer documentation on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
+If you prefer to build the plugin from source, clone the GitHub repository locally and run the command `go build` from the root directory. Upon successful compilation, a `packer-plugin-cnspec` plugin binary file can be found in the root directory. To install the compiled plugin, please follow the official Packer documentation on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
 By using `make dev`, the binary is copied into `~/.packer.d/plugins/` after the build.
 
