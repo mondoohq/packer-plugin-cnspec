@@ -1,4 +1,4 @@
-name: goreleaser
+name: Build Packer Plugin
 
 ## Only trigger tests if source is changing
 on:
@@ -21,13 +21,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.19
-      - name: Cache Go modules
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: "Install required tooling"
         run: |
           sudo apt install -y zip
