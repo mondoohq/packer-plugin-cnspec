@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"github.com/hashicorp/packer-plugin-sdk/tmp"
 	"golang.org/x/crypto/ssh"
@@ -20,7 +20,7 @@ type userKey struct {
 func newUserKey(pubKeyFile string) (*userKey, error) {
 	userKey := new(userKey)
 	if len(pubKeyFile) > 0 {
-		pubKeyBytes, err := ioutil.ReadFile(pubKeyFile)
+		pubKeyBytes, err := os.ReadFile(pubKeyFile)
 		if err != nil {
 			return nil, errors.New("failed to read public key")
 		}
@@ -74,7 +74,7 @@ func newSigner(privKeyFile string) (*signer, error) {
 	signer := new(signer)
 
 	if len(privKeyFile) > 0 {
-		privateBytes, err := ioutil.ReadFile(privKeyFile)
+		privateBytes, err := os.ReadFile(privKeyFile)
 		if err != nil {
 			return nil, errors.New("failed to load private host key")
 		}

@@ -17,6 +17,9 @@ dev: build
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
+test/golanglint:
+	@golangci-lint run
+
 install-packer-sdc: ## Install packer software development command
 	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
 

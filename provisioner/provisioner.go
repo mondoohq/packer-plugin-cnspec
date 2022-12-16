@@ -456,7 +456,10 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 			ui.Error(wErr.Error())
 			return wErr
 		}
-		viper.ReadConfig(bytes.NewBuffer(decodedData))
+		err = viper.ReadConfig(bytes.NewBuffer(decodedData))
+		if err != nil {
+			return errors.Wrap(err, "could not read config from MONDOO_CONFIG_BASE64")
+		}
 	} else {
 		// load first config we find in the following order:
 		// 1. MONDOO_CONFIG_PATH env variable
@@ -540,10 +543,13 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		if serviceAccount != nil {
 			ui.Message("using service account credentials")
 			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn()))
-			certAuth, _ := upstream.NewServiceAccountRangerPlugin(serviceAccount)
+			certAuth, err := upstream.NewServiceAccountRangerPlugin(serviceAccount)
+			if err != nil {
+				ui.Error("could not create service account plugin: " + err.Error())
+				return err
+			}
 			plugins := []ranger.ClientPlugin{certAuth}
 			scannerOpts = append(scannerOpts, scan.WithPlugins(plugins))
-
 		}
 
 		ui.Message("scan packer build")
