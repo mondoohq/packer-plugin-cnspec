@@ -3,7 +3,7 @@ module go.mondoo.com/packer-plugin-cnspec
 require (
 	github.com/cockroachdb/errors v1.9.0
 	github.com/hashicorp/hcl/v2 v2.14.1
-	github.com/hashicorp/packer-plugin-sdk v0.3.2
+	github.com/hashicorp/packer-plugin-sdk v0.3.4
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/viper v1.14.0
