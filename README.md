@@ -15,8 +15,8 @@ Packer plugin cnspec is designed to work in one of two modes:
 
 Check out the Packer tutorials on the Mondoo documentation site:
 
-- [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/tutorials/aws/build-secure-amis-packer/) 
-- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/tutorials/gcp/build-secure-gcp-vm-images-packer/) 
+- [Building secure AMIs with Mondoo and Packer]([https://mondoo.com/docs/cnspec/cnspec-aws/cnspec-aws-packer/)
+- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cnspec-gcp/cnspec-gcp-packer/) 
 
 # Installation
 
