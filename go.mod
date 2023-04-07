@@ -12,7 +12,7 @@ require (
 	github.com/spf13/afero v1.9.5
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.2
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.13.1
 	go.mondoo.com/cnquery v0.0.0-20230407131201-bc8da1a91676
 	go.mondoo.com/cnspec v0.0.0-20230407115242-119879744987
 	go.mondoo.com/ranger-rpc v0.5.1
