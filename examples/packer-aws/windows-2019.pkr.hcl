@@ -47,7 +47,7 @@ build {
   name    = "${var.image_prefix}-${local.timestamp}"
   sources = ["source.amazon-ebs.windows2019"]
 
-  provisioner "mondoo" {
+  provisioner "cnspec" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
     annotations = {

@@ -37,7 +37,7 @@ jobs:
 
       - name: "Install required tooling"
         run: |
-          sudo apt install -y zip
+          apt install -y zip
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:

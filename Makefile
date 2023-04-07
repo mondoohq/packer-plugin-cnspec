@@ -13,7 +13,7 @@ build:
 dev: build
 	@mkdir -p ~/.packer.d/plugins/
 	@mv ${BINARY} ~/.packer.d/plugins/${BINARY}
-
+	
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 

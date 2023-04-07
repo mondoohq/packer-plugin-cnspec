@@ -5,7 +5,7 @@ packer {
       source  = "github.com/hashicorp/docker"
     }
     cnspec = {
-      version = ">= 6.1.3"
+      version = ">= 8.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
@@ -22,7 +22,7 @@ build {
     "source.docker.ubuntu"
   ]
 
-  provisioner "mondoo" {
+  provisioner "cnspec" {
     on_failure =  "continue"
 
     asset_name = "test-name"
