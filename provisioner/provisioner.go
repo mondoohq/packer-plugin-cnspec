@@ -542,7 +542,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		serviceAccount := cfg.GetServiceCredential()
 		if serviceAccount != nil {
 			ui.Message("using service account credentials")
-			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn()))
+			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn(), ranger.DefaultHttpClient()))
 			certAuth, err := upstream.NewServiceAccountRangerPlugin(serviceAccount)
 			if err != nil {
 				ui.Error("could not create service account plugin: " + err.Error())
