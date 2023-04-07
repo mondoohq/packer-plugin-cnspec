@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
 
 jobs:
   goreleaser:
@@ -26,12 +27,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_VERSION: x5.0
+      - name: Install Github CLI (gh)
+        if: ${{ jobs.goreleaser.runs-on != 'self-hosted' }}
+        run: |
+          # For shared runners we install gh, for private runners its already installed
+          wget https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_linux_amd64.deb
+          dpkg -i gh_2.20.2_linux_amd64.deb
       - name: Duplicate Shasum
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          wget https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_linux_amd64.deb
-          dpkg -i gh_2.20.2_linux_amd64.deb
           gh release download ${{github.ref_name}} --pattern '*_SHA256SUMS'
           mv packer-plugin-cnspec_${{github.ref_name}}_SHA256SUMS packer-plugin-mondoo_${{github.ref_name}}_SHA256SUMS
           gh release upload ${{github.ref_name}} packer-plugin-mondoo_${{github.ref_name}}_SHA256SUMS
