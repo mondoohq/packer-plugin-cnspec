@@ -55,7 +55,9 @@ builds:
 archives:
   - id: releases-packer-plugin-cnspec
     builds:
-      - packer-plugin-cnspec
+      - packer-plugin-cnspec-linux
+      - packer-plugin-cnspec-windows
+      - packer-plugin-cnspec-darwin
     name_template: 'packer-plugin-cnspec_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     format: zip
     files:
