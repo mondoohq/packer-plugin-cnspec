@@ -36,8 +36,9 @@ jobs:
           version: latest
 
       - name: "Install required tooling"
+        if: ${{ jobs.goreleaser.runs-on != 'self-hosted' }}
         run: |
-          apt install -y zip
+          sudo apt install -y zip
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
