@@ -56,7 +56,7 @@ By using `make dev`, the binary is copied into `~/.packer.d/plugins/` after the 
 | `annotations`     | Custom annotations can be applied to Packer build assets to provide additional metadata for asset tracking.  | `map of strings` | None | No |
 | `asset_name`      | Overwrite the asset name in Mondoo Platform. | `string` | None | No |
 | `on_failure`      | Set `on_failure = "continue"` to ignore build failures that do not meet any set `score_threshold`.| `string` | None | No |
-| `score_threshold` | Set a score threshold for Packer builds `[0-100]`. Any scans that fall below the `score_threshold` will fail unless `on_failure = "continue"`. For more information see [Policy Scoring](https://mondoo.com/docs/platform/policies/scoring/index.html) in the Mondoo documentation. | `int`            | None        | No           |
+| `score_threshold` | Set a score threshold for Packer builds `[0-100]`. Any scans that fall below the `score_threshold` will fail unless `on_failure = "continue"`. To learn more, read [Scoring](https://mondoo.com/docs/cnspec/cnspec-policies/write/simple/#scoring) in the Mondoo documentation. | `int`            | None        | No           |
 | `sudo`            | Use sudo to elevate permissions when running Mondoo scans. | `bool`         | None        | No           |
 | `mondoo_config_path`            | The path to the configuration to be used when running Mondoo scans. | `string`         | None        | No           |
 
