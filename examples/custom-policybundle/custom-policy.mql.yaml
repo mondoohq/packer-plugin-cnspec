@@ -1,0 +1,22 @@
+policies:
+  - uid: custom-policy
+    name: Packer Build Policy
+    version: "1.0.0"
+    scoring_system: highest impact
+    authors:
+      - name: Mondoo Inc
+        email: hello@mondoo.io
+    groups:
+      - title: Packages
+        filters:
+        - mql: asset.family.contains('unix')
+        checks:
+          - uid: no-ssh-installed
+            title: Ensure ssh-server is not installed
+            mql: package("openssh-server").installed == false
+            impact: 30
+
+          - uid: no-telnet-installed
+            title: Ensure telnet-server is not installed
+            mql: package("telnet-server").installed == false
+            impact: 100
