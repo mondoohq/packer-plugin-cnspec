@@ -9,6 +9,8 @@ on:
 jobs:
   goreleaser:
     runs-on: self-hosted
+    env:
+      RUNNER_TYPE: "self-hosted"
     timeout-minutes: 120
     steps:
       - name: Checkout
@@ -29,7 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_VERSION: x5.0
       - name: Install Github CLI (gh)
-        if: ${{ jobs.goreleaser.runs-on != 'self-hosted' }}
+        if: ${{ env.RUNNER_TYPE != 'self-hosted' }}
         run: |
           # For shared runners we install gh, for private runners its already installed
           wget https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_linux_amd64.deb

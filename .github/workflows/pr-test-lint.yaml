@@ -14,6 +14,8 @@ env:
 jobs:
   goreleaser:
     runs-on: self-hosted
+    env:
+      RUNNER_TYPE: "self-hosted"
     timeout-minutes: 120
     steps:
       - name: Checkout
@@ -34,8 +36,10 @@ jobs:
         uses: golangci/golangci-lint-action@v3.4.0
         with:
           version: latest
+          skip-cache: true
 
       - name: "Install required tooling"
+        if: ${{ env.RUNNER_TYPE != 'self-hosted' }}
         run: |
           # Only use sudo on self-hosted runners
           sudo apt install -y zip
