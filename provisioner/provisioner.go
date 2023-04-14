@@ -400,6 +400,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		if err != nil {
 			return errors.Wrap(err, "could not load policy bundle from "+p.config.PolicyBundle)
 		}
+		p.config.Incognito = true
 	}
 
 	// If annotations are not specified, this will error out so make sure to init the map.
