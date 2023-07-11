@@ -13,8 +13,8 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.10.0
-	go.mondoo.com/cnquery v0.0.0-20230703142853-10b934935e26
-	go.mondoo.com/cnspec v0.0.0-20230703214715-881d7fe8fd6e
+	go.mondoo.com/cnquery v0.0.0-20230711094059-d4b66ec651d9
+	go.mondoo.com/cnspec v0.0.0-20230711104318-c76f6a911032
 	go.mondoo.com/ranger-rpc v0.5.1
 	golang.org/x/crypto v0.9.0
 )
@@ -471,7 +471,7 @@ require (
 	github.com/vbatts/tar-split v0.11.2 // indirect
 	github.com/vmware/go-vcloud-director/v2 v2.17.0 // indirect
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702 // indirect
-	github.com/vmware/govmomi v0.29.0 // indirect
+	github.com/vmware/govmomi v0.30.4 // indirect
 	github.com/xanzy/go-gitlab v0.74.0 // indirect
 	github.com/xen0n/gosmopolitan v1.2.1 // indirect
 	github.com/yagipy/maintidx v1.0.0 // indirect
