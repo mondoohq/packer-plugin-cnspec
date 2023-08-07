@@ -13,8 +13,8 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.10.0
-	go.mondoo.com/cnquery v0.0.0-20230727114744-dcec91779950
-	go.mondoo.com/cnspec v0.0.0-20230801084405-352eec9db5e0
+	go.mondoo.com/cnquery v0.0.0-20230807204844-5ae799924a5c
+	go.mondoo.com/cnspec v0.0.0-20230807223928-66ec8e30fb36
 	go.mondoo.com/ranger-rpc v0.5.1
 	golang.org/x/crypto v0.11.0
 )
@@ -199,7 +199,7 @@ require (
 	github.com/denis-tingaikin/go-header v0.4.3 // indirect
 	github.com/docker/cli v20.10.20+incompatible // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/docker/docker v20.10.24+incompatible // indirect
+	github.com/docker/docker v24.0.5+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
