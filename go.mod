@@ -6,13 +6,13 @@ replace github.com/slack-go/slack v0.12.1 => github.com/imilchev/slack v0.0.0-20
 
 require (
 	github.com/cockroachdb/errors v1.9.1
-	github.com/hashicorp/hcl/v2 v2.14.1
-	github.com/hashicorp/packer-plugin-sdk v0.4.0
+	github.com/hashicorp/hcl/v2 v2.16.2
+	github.com/hashicorp/packer-plugin-sdk v0.5.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/afero v1.9.5
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.12.1
 	go.mondoo.com/cnquery v0.0.0-20230816041933-14675f879749
 	go.mondoo.com/cnspec v0.0.0-20230816081904-8739716a4ea7
 	go.mondoo.com/ranger-rpc v0.5.1
@@ -408,6 +408,7 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
+	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
 	github.com/pkg/term v1.2.0-beta.2 // indirect
