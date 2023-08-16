@@ -13,8 +13,8 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.10.0
-	go.mondoo.com/cnquery v0.0.0-20230807204844-5ae799924a5c
-	go.mondoo.com/cnspec v0.0.0-20230807223928-66ec8e30fb36
+	go.mondoo.com/cnquery v0.0.0-20230816041933-14675f879749
+	go.mondoo.com/cnspec v0.0.0-20230816081904-8739716a4ea7
 	go.mondoo.com/ranger-rpc v0.5.1
 	golang.org/x/crypto v0.11.0
 )
@@ -42,7 +42,7 @@ require (
 	cloud.google.com/go/storage v1.30.1 // indirect
 	github.com/4meepo/tagalign v1.2.2 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
-	github.com/99designs/keyring v1.2.1 // indirect
+	github.com/99designs/keyring v1.2.2 // indirect
 	github.com/Abirdcfly/dupword v0.0.11 // indirect
 	github.com/Antonboom/errname v0.1.10 // indirect
 	github.com/Antonboom/nilnil v0.1.5 // indirect
@@ -494,7 +494,7 @@ require (
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/term v0.10.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
