@@ -44,7 +44,7 @@ jobs:
           # Only use sudo on self-hosted runners
           sudo apt install -y zip
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --snapshot --skip-publish --rm-dist
