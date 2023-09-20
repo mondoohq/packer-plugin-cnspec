@@ -1,3 +1,6 @@
+// Copyright (c) Mondoo, Inc.
+// SPDX-License-Identifier: BUSL-1.1
+
 package provisioner
 
 // https://www.packer.io/docs/templates/legacy_json_templates/engine

@@ -1,3 +1,6 @@
+# Copyright (c) Mondoo, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
 /*
     DESCRIPTION:
     Rocky Linux 8 template using the Packer Builder for VMware vSphere (vsphere-iso).

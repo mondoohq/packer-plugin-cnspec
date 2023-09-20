@@ -1,3 +1,6 @@
+// Copyright (c) Mondoo, Inc.
+// SPDX-License-Identifier: BUSL-1.1
+
 package version
 
 import "github.com/hashicorp/packer-plugin-sdk/version"

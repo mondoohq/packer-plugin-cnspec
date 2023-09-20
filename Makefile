@@ -37,3 +37,12 @@ generate: install-packer-sdc
 	@go generate ./...
 	packer-sdc renderdocs -src ./docs -dst ./.docs -partials ./docs-partials
 	# checkout the .docs folder for a preview of the docs
+
+# Copywrite Check Tool: https://github.com/hashicorp/copywrite
+license: license/headers/check
+
+license/headers/check:
+	copywrite headers --plan
+
+license/headers/apply:
+	copywrite headers

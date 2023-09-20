@@ -1,3 +1,6 @@
+# Copyright (c) Mondoo, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
 // vSphere Settings
 vsphere_endpoint             = "sfo-w01-vc01.sfo.rainpole.io"
 vsphere_username             = "svc-packer-vsphere@rainpole.io"
