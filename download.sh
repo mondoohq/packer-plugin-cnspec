@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) Mondoo, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
 # Mondoo, Inc
 # This script installs the latest version of the packer plugin for cases where the new HCL format cannot be used
 # Please also have a look at the packer documentation https://www.packer.io/docs/plugins

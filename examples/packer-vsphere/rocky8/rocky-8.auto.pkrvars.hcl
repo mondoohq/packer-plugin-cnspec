@@ -1,3 +1,6 @@
+# Copyright (c) Mondoo, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
 /*
     DESCRIPTION:
     Rocky Linux 8 variables used by the Packer Plugin for VMware vSphere (vsphere-iso).

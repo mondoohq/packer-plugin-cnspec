@@ -1,3 +1,6 @@
+# Copyright (c) Mondoo, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
 policies:
   - uid: custom-centos7-policy
     name: CentOS 7 Virtual Machine Configuration Policy
