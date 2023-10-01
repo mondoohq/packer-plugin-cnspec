@@ -1,5 +1,7 @@
 # Packer Plugin for Mondoo cnspec
 
+![packer-plugin-cnspec illustration](.github/social/preview.jpg)
+
 Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. cnspec supports scanning of Linux, Windows, and macOS, as well as Docker containers.
 
 ## Plugin modes
