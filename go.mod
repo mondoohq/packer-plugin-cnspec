@@ -6,13 +6,13 @@ replace github.com/slack-go/slack v0.12.1 => github.com/imilchev/slack v0.0.0-20
 
 require (
 	github.com/cockroachdb/errors v1.9.1
-	github.com/hashicorp/hcl/v2 v2.14.1
+	github.com/hashicorp/hcl/v2 v2.18.1
 	github.com/hashicorp/packer-plugin-sdk v0.4.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/afero v1.9.5
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.13.0
 	go.mondoo.com/cnquery v0.0.0-20230816041933-14675f879749
 	go.mondoo.com/cnspec v0.0.0-20230816081904-8739716a4ea7
 	go.mondoo.com/ranger-rpc v0.5.1
@@ -96,6 +96,7 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195 // indirect
 	github.com/aristanetworks/goeapi v1.0.0 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
