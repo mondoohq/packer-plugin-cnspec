@@ -5,14 +5,40 @@ COUNT?=1
 TEST?=$(shell go list ./...)
 HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/packer-plugin-sdk | cut -d " " -f2)
 
+ifndef LATEST_VERSION_TAG
+# echo "read LATEST_VERSION_TAG from git"
+LATEST_VERSION_TAG=$(shell git describe --abbrev=0 --tags)
+endif
+
+ifndef MANIFEST_VERSION
+# echo "read MANIFEST_VERSION from git"
+MANIFEST_VERSION=$(shell git describe --abbrev=0 --tags)
+endif
+
+ifndef TAG
+# echo "read TAG from git"
+TAG=$(shell git log --pretty=format:'%h' -n 1)
+endif
+
+ifndef VERSION
+# echo "read VERSION from git"
+VERSION=${LATEST_VERSION_TAG}+$(shell git rev-list --count HEAD)
+endif
+
 .PHONY: dev
 
 build:
-	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/packer-plugin-cnspec/version.Version=0.0.0 -X go.mondoo.com/packer-plugin-cnspec/version.Build=dev"
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/packer-plugin-cnspec/version.Version=${VERSION} -X go.mondoo.com/packer-plugin-cnspec/version.Build=${TAG}"
 
 dev: build
 	@mkdir -p ~/.packer.d/plugins/
 	@mv ${BINARY} ~/.packer.d/plugins/${BINARY}
+
+.PHONY: dev/linux
+dev/linux: build
+	@mkdir -p ~/.packer.d/plugins/github.com/mondoohq/cnspec/
+	@mv ${BINARY} ~/.packer.d/plugins/github.com/mondoohq/cnspec/${BINARY}_v${VERSION}_x5.0_linux_amd64
+	@cat ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_x5.0_linux_amd64 | sha256sum -z --tag | cut -d"=" -f2 | tr -d " " > ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_x5.0_linux_amd64_SHA256SUM
 	
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m

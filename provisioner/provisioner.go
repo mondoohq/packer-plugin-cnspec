@@ -26,21 +26,18 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/afero"
 	"github.com/spf13/viper"
-	config_loader "go.mondoo.com/cnquery/cli/config"
-	"go.mondoo.com/cnquery/logger"
-	"go.mondoo.com/cnquery/motor/asset"
-	inventory "go.mondoo.com/cnquery/motor/inventory/v1"
-	"go.mondoo.com/cnquery/motor/providers"
-	"go.mondoo.com/cnquery/motor/vault"
-	"go.mondoo.com/cnquery/upstream"
-	cnspec_config "go.mondoo.com/cnspec/apps/cnspec/cmd/config"
-	"go.mondoo.com/cnspec/cli/reporter"
-	"go.mondoo.com/cnspec/policy"
-	"go.mondoo.com/cnspec/policy/scan"
+	config_loader "go.mondoo.com/cnquery/v9/cli/config"
+	"go.mondoo.com/cnquery/v9/logger"
+	"go.mondoo.com/cnquery/v9/providers"
+	"go.mondoo.com/cnquery/v9/providers-sdk/v1/inventory"
+	"go.mondoo.com/cnquery/v9/providers-sdk/v1/upstream"
+	"go.mondoo.com/cnquery/v9/providers-sdk/v1/vault"
+	cnspec_config "go.mondoo.com/cnspec/v9/apps/cnspec/cmd/config"
+	"go.mondoo.com/cnspec/v9/cli/reporter"
+	"go.mondoo.com/cnspec/v9/policy"
+	"go.mondoo.com/cnspec/v9/policy/scan"
 	"go.mondoo.com/packer-plugin-cnspec/version"
-	"go.mondoo.com/ranger-rpc"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -330,21 +327,21 @@ func (p *Provisioner) ConfigSpec() hcldec.ObjectSpec {
 
 func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) error {
 
-	assetConfig := &providers.Config{
-		Backend: providers.ProviderType_UNKNOWN,
+	assetConfig := &inventory.Config{
+		Type:    "unkown",
 		Options: map[string]string{},
 	}
 
 	if p.config.Sudo != nil && p.config.Sudo.Active {
 		ui.Message("activated sudo")
-		assetConfig.Sudo = &providers.Sudo{
+		assetConfig.Sudo = &inventory.Sudo{
 			Active: p.config.Sudo.Active,
 		}
 	}
 
 	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" {
 		ui.Message("detected packer build via ssh")
-		assetConfig.Backend = providers.ProviderType_SSH
+		assetConfig.Type = "ssh"
 		assetConfig.Host = p.buildInfo.Host
 		assetConfig.Port = int32(p.buildInfo.Port)
 		assetConfig.Insecure = true // we do not check the hostkey for the packer build
@@ -377,7 +374,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	} else if p.buildInfo.ConnType == "winrm" {
 		ui.Message("detected packer build via winrm")
-		assetConfig.Backend = providers.ProviderType_WINRM
+		assetConfig.Type = "winrm"
 		assetConfig.Host = p.buildInfo.Host
 		assetConfig.Port = int32(p.buildInfo.Port)
 		assetConfig.Insecure = true // we do not check the hostkey for the packer build
@@ -385,7 +382,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		assetConfig.Credentials = append(assetConfig.Credentials, cred)
 	} else if p.buildInfo.ConnType == "docker" {
 		ui.Message("detected packer container image build")
-		assetConfig.Backend = providers.ProviderType_DOCKER
+		assetConfig.Type = "docker-container"
 		// buildInfo.ID containers the docker container image id
 		assetConfig.Host = fmt.Sprintf("%s", p.buildInfo.ID)
 	} else {
@@ -417,9 +414,9 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	// build configuration
-	conf := inventory.New(inventory.WithAssets(&asset.Asset{
+	conf := inventory.New(inventory.WithAssets(&inventory.Asset{
 		Name:        p.config.AssetName,
-		Connections: []*providers.Config{assetConfig},
+		Connections: []*inventory.Config{assetConfig},
 		Annotations: p.config.Annotations,
 		Labels: map[string]string{
 			"packer.io/buildname": p.config.PackerBuildName,
@@ -477,13 +474,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		if p.config.MondooConfigPath != "" {
 			paths = append(paths, p.config.MondooConfigPath)
 		} else {
-			config_loader.AppFs = afero.NewOsFs() // TODO fix in config_loader package, this should not be here
-			homeConfig, exists, err := config_loader.HomePath()
-			if err == nil && exists {
+			homeConfig, err := config_loader.HomePath(config_loader.DefaultConfigFile)
+			if err == nil && homeConfig != "" {
 				paths = append(paths, homeConfig)
 			}
 
-			if path, ok := config_loader.SystemPath(); ok {
+			if path := config_loader.SystemConfigPath(config_loader.DefaultConfigFile); path != "" {
 				paths = append(paths, path)
 			}
 		}
@@ -528,7 +524,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	var err error
 	if p.config.Incognito {
 		ui.Message("scan packer build in incognito mode")
-		scanService := scan.NewLocalScanner()
+		scanService := scan.NewLocalScanner(scan.WithRecording(providers.NullRecording{}))
 		result, err = scanService.RunIncognito(context.Background(), scanJob)
 		if err != nil {
 			return err
@@ -545,15 +541,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		serviceAccount := cfg.GetServiceCredential()
 		if serviceAccount != nil {
 			ui.Message("using service account credentials")
-			scannerOpts = append(scannerOpts, scan.WithUpstream(cfg.UpstreamApiEndpoint(), cfg.GetParentMrn(), ranger.DefaultHttpClient()))
-			certAuth, err := upstream.NewServiceAccountRangerPlugin(serviceAccount)
-			if err != nil {
-				ui.Error("could not create service account plugin: " + err.Error())
-				return err
+			upstreamConfig := &upstream.UpstreamConfig{
+				SpaceMrn:    cfg.GetParentMrn(),
+				ApiEndpoint: cfg.UpstreamApiEndpoint(),
+				Creds:       serviceAccount,
 			}
-			plugins := []ranger.ClientPlugin{certAuth}
-			scannerOpts = append(scannerOpts, scan.WithPlugins(plugins))
+			scannerOpts = append(scannerOpts, scan.WithUpstream(upstreamConfig))
 		}
+		scannerOpts = append(scannerOpts, scan.WithRecording(providers.NullRecording{}))
 
 		ui.Message("scan packer build")
 		scanService := scan.NewLocalScanner(scannerOpts...)
