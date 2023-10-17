@@ -39,6 +39,12 @@ dev/linux: build
 	@mkdir -p ~/.packer.d/plugins/github.com/mondoohq/cnspec/
 	@mv ${BINARY} ~/.packer.d/plugins/github.com/mondoohq/cnspec/${BINARY}_v${VERSION}_x5.0_linux_amd64
 	@cat ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_x5.0_linux_amd64 | sha256sum -z --tag | cut -d"=" -f2 | tr -d " " > ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_x5.0_linux_amd64_SHA256SUM
+
+.PHONY: dev/macos
+dev/macos: build
+	@mkdir -p ~/.packer.d/plugins/github.com/mondoohq/cnspec/
+	@mv ${BINARY} ~/.packer.d/plugins/github.com/mondoohq/cnspec/${BINARY}_v${VERSION}_macos_amd64
+	@cat ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_macos_amd64 | shasum --tag | cut -d"=" -f2 | tr -d " " > ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_macos_amd64_SHA256SUM
 	
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m

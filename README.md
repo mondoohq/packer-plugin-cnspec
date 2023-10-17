@@ -31,7 +31,7 @@ To install this plugin, copy and paste this code into your Packer configuration 
 packer {
   required_plugins {
     cnspec = {
-      version = ">= 6.1.3"
+      version = ">= 9.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
