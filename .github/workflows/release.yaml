@@ -23,7 +23,7 @@ jobs:
           go-version: '1.20'
           cache: false
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --rm-dist --timeout 120m
