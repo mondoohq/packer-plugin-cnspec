@@ -84,7 +84,7 @@ provisioner "cnspec" {
 
 ## Sample Packer Templates
 
-You can find example Packer templates in the [examples](/examples/) directory in this repository.
+You can find example Packer templates in the [examples](/examples/) directory in this repository. You can also find a [GitHub Action workflow example](/examples/github-actions/packer-build-scan.yaml) of how to use cnspec to test builds as part of a CI/CD pipeline.
 
 ## Get Started with cnspec
 
