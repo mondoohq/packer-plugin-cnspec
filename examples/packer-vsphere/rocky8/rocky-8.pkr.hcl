@@ -21,7 +21,7 @@ packer {
       source  = "github.com/hashicorp/vsphere"
     }
     cnspec = {
-      version = ">= v6.1.4"
+      version = ">= 9.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }

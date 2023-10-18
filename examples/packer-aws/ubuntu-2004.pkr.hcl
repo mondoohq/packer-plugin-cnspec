@@ -8,7 +8,7 @@ packer {
       source  = "github.com/hashicorp/amazon"
     }
     cnspec = {
-      version = ">= 6.1.3"
+      version = ">= 9.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
