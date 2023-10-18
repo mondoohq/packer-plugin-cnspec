@@ -60,13 +60,15 @@ build {
   provisioner "shell" {
     inline = [
       "sudo hostnamectl set-hostname ${var.image_prefix}-${local.timestamp}",
-      "sudo yum update -y",
-      "sudo yum upgrade -y"]
+    ]
   }
 
   provisioner "cnspec" {
     on_failure = "continue"
     asset_name = "${var.image_prefix}-${local.timestamp}"
+    sudo {
+      active = true
+    }
     annotations = {
       Source_AMI    = "{{ .SourceAMI }}"
       Creation_Date = "{{ .SourceAMICreationDate }}"

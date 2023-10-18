@@ -1,0 +1,42 @@
+name: Packer AMI Build and Scan 
+
+on:
+  push:
+
+env:
+  PRODUCT_VERSION: "1.8.6" # or: "latest"
+  MONDOO_CONFIG_BASE64: ${{ secrets.MONDOO_CONFIG_BASE64 }}
+  PACKER_TEMPLATE: image.pkr.hcl
+
+jobs:
+  packer-build-and-test:
+    runs-on: ubuntu-latest
+    name: packer
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+      - name: Initialize Packer Template
+        id: init
+        run: packer init ${{ env.PACKER_TEMPLATE }}
+
+      - name: Validate Packer Template
+        id: validate
+        run: packer validate ${{ env.PACKER_TEMPLATE }}
+
+      - name: Build Packer AMI
+        run: packer build -color=false -on-error=abort ${{ env.PACKER_TEMPLATE }}
