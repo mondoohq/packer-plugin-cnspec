@@ -2,22 +2,23 @@ module go.mondoo.com/packer-plugin-cnspec
 
 go 1.21
 
-toolchain go1.21.1
+toolchain go1.21.3
 
 replace github.com/slack-go/slack v0.12.1 => github.com/imilchev/slack v0.0.0-20230324120548-5380d7dd00a5
 
-require go.mondoo.com/cnquery/v9 v9.2.0
-
-require go.mondoo.com/cnspec/v9 v9.2.0
+require (
+	go.mondoo.com/cnquery/v9 v9.2.0
+	go.mondoo.com/cnspec/v9 v9.2.0
+)
 
 require (
 	github.com/cockroachdb/errors v1.11.1
-	github.com/hashicorp/hcl/v2 v2.14.1
-	github.com/hashicorp/packer-plugin-sdk v0.4.0
+	github.com/hashicorp/hcl/v2 v2.19.0
+	github.com/hashicorp/packer-plugin-sdk v0.5.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.17.0
 	github.com/stretchr/testify v1.8.4
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.13.0
 	golang.org/x/crypto v0.14.0
 )
 
@@ -52,6 +53,7 @@ require (
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/alingse/asasalint v0.0.11 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
@@ -236,6 +238,7 @@ require (
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/term v1.2.0-beta.2 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
