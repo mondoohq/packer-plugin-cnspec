@@ -4,7 +4,7 @@ go 1.21
 
 toolchain go1.21.3
 
-replace github.com/slack-go/slack v0.12.1 => github.com/imilchev/slack v0.0.0-20230324120548-5380d7dd00a5
+replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.12.1 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
 	go.mondoo.com/cnquery/v9 v9.2.0
@@ -13,7 +13,7 @@ require (
 
 require (
 	github.com/cockroachdb/errors v1.11.1
-	github.com/hashicorp/hcl/v2 v2.19.0
+	github.com/hashicorp/hcl/v2 v2.16.2
 	github.com/hashicorp/packer-plugin-sdk v0.5.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.17.0
@@ -53,7 +53,6 @@ require (
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/alingse/asasalint v0.0.11 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
