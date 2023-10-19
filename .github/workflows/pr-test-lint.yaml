@@ -9,7 +9,21 @@ on:
       - 'go.sum'
 
 jobs:
+  license-check:
+    name: License Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Copywrite
+        uses: hashicorp/setup-copywrite@v1.1.2
+
+      - name: Check Header Compliance
+        run: copywrite headers --plan
+
   goreleaser:
+    name: GoReleaser
     runs-on: self-hosted
     env:
       RUNNER_TYPE: "self-hosted"
