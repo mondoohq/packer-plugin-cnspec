@@ -24,6 +24,8 @@ jobs:
         with:
           go-version: ">=${{ env.golang-version }}"
           cache: false
+      - name: Set cnspec version
+        run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v9 | jq -r '.Version')" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -32,6 +34,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_VERSION: x5.0
+          CNSPEC_VERSION: ${{ env.CNSPEC_VERSION }}
       - name: Install Github CLI (gh)
         if: ${{ env.RUNNER_TYPE != 'self-hosted' }}
         run: |
