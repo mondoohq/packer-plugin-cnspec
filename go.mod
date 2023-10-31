@@ -347,7 +347,3 @@ require (
 	mvdan.cc/unparam v0.0.0-20230917202934-3ee2d22f45fb // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-replace go.mondoo.com/cnspec => /home/christian/workspace/mondoo/github.com/cnspec
-
-replace go.mondoo.com/cnquery => /home/christian/workspace/mondoo/github.com/cnquery
