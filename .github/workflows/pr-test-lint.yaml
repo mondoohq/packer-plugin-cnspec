@@ -56,6 +56,8 @@ jobs:
         run: |
           # Only use sudo on self-hosted runners
           sudo apt install -y zip
+      - name: Set cnspec version
+        run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v9 | jq -r '.Version')" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -63,3 +65,4 @@ jobs:
           args: release --snapshot --skip-publish --rm-dist
         env:
           API_VERSION: x5.0
+          CNSPEC_VERSION: ${{ env.CNSPEC_VERSION }}
