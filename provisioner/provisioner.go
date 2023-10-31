@@ -524,7 +524,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	var err error
 	if p.config.Incognito {
 		ui.Message("scan packer build in incognito mode")
-		scanService := scan.NewLocalScanner(scan.WithRecording(providers.NullRecording{}))
+		scanService := scan.NewLocalScanner()
 		result, err = scanService.RunIncognito(context.Background(), scanJob)
 		if err != nil {
 			return err
