@@ -520,6 +520,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
+	updateOsProvider(ui)
+
 	var result *scan.ScanResult
 	var err error
 	if p.config.Incognito {
@@ -597,4 +599,38 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	return nil
+}
+
+func updateOsProvider(ui packer.Ui) {
+	allProviders, err := providers.ListActive()
+	if err != nil {
+		ui.Error(err.Error())
+		ui.Message("failed to list providers, not going to update cnspec os provider")
+		return
+	}
+	outdated := false
+	for _, provider := range allProviders {
+		if provider.Name == "os" {
+			latestVersion, err := providers.LatestVersion(provider.Name)
+			if err != nil {
+				ui.Error(err.Error())
+				ui.Message("failed to determine latest version for os provider, not going to update it")
+				return
+			}
+			if latestVersion != provider.Version {
+				outdated = true
+			}
+		}
+	}
+
+	if outdated {
+		installed, err := providers.Install("os", "")
+		if err != nil {
+			ui.Error(err.Error())
+			ui.Message("failed to install/update os provider")
+		}
+		if installed != nil {
+			ui.Message("successfully installed " + installed.Name + " provider" + " version=" + installed.Version + " path=" + installed.Path)
+		}
+	}
 }

@@ -17,7 +17,7 @@ packer {
 variable "image_prefix" {
   type        = string
   description = "Prefix to be applied to image name"
-  default     = "mondoo-gcp-ubuntu-2004-secure-base"
+  default     = "mondoo-ubuntu-2004-secure-base"
 }
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
@@ -28,7 +28,7 @@ source "docker" "ubuntu" {
 }
 
 build {
-  name    = "mondoo-docker-ubuntu-2204-secure-base"
+  name    = "mondoo-docker-ubuntu-2004-secure-base"
   sources = [
     "source.docker.ubuntu"
   ]
