@@ -605,32 +605,31 @@ func updateOsProvider(ui packer.Ui) {
 	allProviders, err := providers.ListActive()
 	if err != nil {
 		ui.Error(err.Error())
-		ui.Message("failed to list providers, not going to update cnspec os provider")
+		ui.Message("failed to list providers, not going to update cnspec providers")
 		return
 	}
-	outdated := false
+	updatedProviders := []*providers.Provider{}
 	for _, provider := range allProviders {
-		if provider.Name == "os" {
-			latestVersion, err := providers.LatestVersion(provider.Name)
-			if err != nil {
-				ui.Error(err.Error())
-				ui.Message("failed to determine latest version for os provider, not going to update it")
-				return
-			}
-			if latestVersion != provider.Version {
-				outdated = true
-			}
+		if provider.Name == "mock" || provider.Name == "core" {
+			continue
 		}
-	}
-
-	if outdated {
-		installed, err := providers.Install("os", "")
+		latestVersion, err := providers.LatestVersion(provider.Name)
 		if err != nil {
 			ui.Error(err.Error())
-			ui.Message("failed to install/update os provider")
+			ui.Message("failed to determine latest version for " + provider.Name + " provider, not going to update it")
+			continue
 		}
-		if installed != nil {
-			ui.Message("successfully installed " + installed.Name + " provider" + " version=" + installed.Version + " path=" + installed.Path)
+		if latestVersion != provider.Version {
+			installed, err := providers.Install(provider.Name, "")
+			if err != nil {
+				ui.Error(err.Error())
+				ui.Message("failed to install/update " + provider.Name + " provider")
+				continue
+			}
+			updatedProviders = append(updatedProviders, installed)
 		}
+	}
+	for _, p := range updatedProviders {
+		ui.Message("successfully installed " + p.Name + " provider" + " version=" + p.Version + " path=" + p.Path)
 	}
 }
