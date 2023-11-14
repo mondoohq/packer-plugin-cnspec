@@ -520,7 +520,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
-	updateOsProvider(ui)
+	updateProviders(ui)
 
 	var result *scan.ScanResult
 	var err error
@@ -601,7 +601,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	return nil
 }
 
-func updateOsProvider(ui packer.Ui) {
+func updateProviders(ui packer.Ui) {
 	allProviders, err := providers.ListActive()
 	if err != nil {
 		ui.Error(err.Error())
