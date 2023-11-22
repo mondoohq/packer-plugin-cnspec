@@ -3,7 +3,7 @@
 integration {
   name = "Mondoo"
   description = "TODO"
-  identifier = "packer/BrandonRomano/cnspec"
+  identifier = "packer/mondoohq/cnspec"
   component {
     type = "provisioner"
     name = "Mondoo"
