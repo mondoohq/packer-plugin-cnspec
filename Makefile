@@ -49,7 +49,7 @@ dev/macos: build
 	@mkdir -p ~/.packer.d/plugins/github.com/mondoohq/cnspec/
 	@mv ${BINARY} ~/.packer.d/plugins/github.com/mondoohq/cnspec/${BINARY}_v${VERSION}_macos_amd64
 	@cat ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_macos_amd64 | shasum --tag | cut -d"=" -f2 | tr -d " " > ~/.packer.d/plugins/github.com/mondoohq/cnspec/packer-plugin-cnspec_v${VERSION}_macos_amd64_SHA256SUM
-	
+
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
@@ -59,10 +59,6 @@ test/golanglint:
 install-packer-sdc: ## Install packer software development command
 	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
 
-ci-release-docs: install-packer-sdc
-	@packer-sdc renderdocs -src docs -partials docs-partials/ -dst docs/
-	@/bin/sh -c "[ -d docs ] && zip -r docs.zip docs/"
-
 plugin-check: install-packer-sdc build
 	@packer-sdc plugin-check ${BINARY}
 
@@ -71,8 +67,10 @@ testacc: dev
 
 generate: install-packer-sdc
 	@go generate ./...
-	packer-sdc renderdocs -src ./docs -dst ./.docs -partials ./docs-partials
-	# checkout the .docs folder for a preview of the docs
+	@rm -rf .docs
+	@packer-sdc renderdocs -src "docs" -partials docs-partials/ -dst ".docs/"
+	@./.web-docs/scripts/compile-to-webdocs.sh "." ".docs" ".web-docs" "mondoohq"
+	@rm -rf ".docs"
 
 # Copywrite Check Tool: https://github.com/hashicorp/copywrite
 license: license/headers/check
@@ -82,9 +80,3 @@ license/headers/check:
 
 license/headers/apply:
 	copywrite headers
-
-build-docs: install-packer-sdc
-	@if [ -d ".docs" ]; then rm -r ".docs"; fi
-	@packer-sdc renderdocs -src "docs" -partials docs-partials/ -dst ".docs/"
-	@./.web-docs/scripts/compile-to-webdocs.sh "." ".docs" ".web-docs" "mondoohq"
-	@rm -r ".docs"
