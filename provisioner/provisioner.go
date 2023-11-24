@@ -88,7 +88,7 @@ type Config struct {
 	// Mondoo Platform.
 	Annotations map[string]string `mapstructure:"annotations"`
 	// Configures incognito mode. Defaults to `true`. When set to false, scan results
-	// will not be sent to the Mondoo platform.
+	// will not be sent to the Mondoo Platform.
 	Incognito bool `mapstructure:"incognito"`
 	// A list of policies to be executed (requires incognito mode).
 	Policies []string `mapstructure:"policies"`

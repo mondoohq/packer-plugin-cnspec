@@ -74,7 +74,7 @@ Optional Parameters:
   Mondoo Platform.
 
 - `incognito` (bool) - Configures incognito mode. Defaults to `true`. When set to false, scan results
-  will not be sent to the Mondoo platform.
+  will not be sent to the Mondoo Platform.
 
 - `policies` ([]string) - A list of policies to be executed (requires incognito mode).
 
