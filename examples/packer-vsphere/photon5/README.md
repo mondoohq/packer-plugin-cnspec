@@ -1,6 +1,6 @@
-# Rocky Linux 8 
+# Photon OS 4
 
-This example builds Rocky Linux 8 with vSphere.
+This example builds Photon OS 4 with vSphere.
 
 Edit the `variables.pkrvars.hcl` file to configure the credentials for the default account on machine images.
 
@@ -24,4 +24,4 @@ Then run packer build:
 packer build -force -var-file variables.pkrvars.hcl .
 ```
 
-Kudos: This example is based on [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere/tree/main/builds/linux/rocky/8)
+Kudos: This example is based on [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere/tree/main/builds/linux/photon/5)
