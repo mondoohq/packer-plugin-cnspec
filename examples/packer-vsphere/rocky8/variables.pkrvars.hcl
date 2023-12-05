@@ -11,6 +11,12 @@ vsphere_cluster              = "sfo-w01-cl01"
 vsphere_datastore            = "sfo-w01-cl01-ds-vsan01"
 vsphere_network              = "sfo-w01-seg-dhcp"
 
+// Build Variables
+build_username           = "rainpole"
+build_password           = "<plaintext_password>"
+build_password_encrypted = "<sha512_encrypted_password>"
+build_key                = "<public_key>"
+
 // Virtual Machine Settings
 common_vm_version           = 19
 common_tools_upgrade_policy = true
@@ -21,12 +27,6 @@ common_template_conversion     = false
 common_content_library_name    = null
 common_content_library_ovf     = true
 common_content_library_destroy = true
-
-// Build Variables
-build_username           = "rainpole"
-build_password           = "<plaintext_password>"
-build_password_encrypted = "<sha512_encrypted_password>"
-build_key                = "<public_key>"
 
 // OVF Export Settings
 common_ovf_export_enabled   = false

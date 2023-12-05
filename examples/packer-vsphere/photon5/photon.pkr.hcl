@@ -28,6 +28,11 @@ packer {
   }
 }
 
+//  BLOCK: data
+//  Defines the data sources.
+
+data "git-repository" "cwd" {}
+
 //  BLOCK: locals
 //  Defines the local variables.
 
@@ -37,6 +42,7 @@ locals {
   build_version     = data.git-repository.cwd.head
   build_description = "Version: ${local.build_version}\nBuilt on: ${local.build_date}\n${local.build_by}"
   iso_paths         = ["[${var.common_iso_datastore}] ${var.iso_path}/${var.iso_file}"]
+  iso_checksum      = "${var.iso_checksum_type}:${var.iso_checksum_value}"
   manifest_date     = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
   manifest_path     = "${path.cwd}/manifests/"
   manifest_output   = "${local.manifest_path}${local.manifest_date}.json"
@@ -99,7 +105,9 @@ source "vsphere-iso" "linux-photon" {
   notes                = local.build_description
 
   // Removable Media Settings
+  iso_url      = var.iso_url
   iso_paths    = local.iso_paths
+  iso_checksum = local.iso_checksum
   http_content = var.common_data_source == "http" ? local.data_source_content : null
   cd_content   = var.common_data_source == "disk" ? local.data_source_content : null
 
@@ -175,31 +183,11 @@ source "vsphere-iso" "linux-photon" {
 build {
   sources = ["source.vsphere-iso.linux-photon"]
 
-  provisioner "ansible" {
-    user                   = var.build_username
-    galaxy_file            = "${path.cwd}/ansible/requirements.yml"
-    galaxy_force_with_deps = true
-    playbook_file          = "${path.cwd}/ansible/main.yml"
-    roles_path             = "${path.cwd}/ansible/roles"
-    ansible_env_vars = [
-      "ANSIBLE_CONFIG=${path.cwd}/ansible/ansible.cfg",
-      "ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3"
-    ]
-    extra_arguments = [
-      "--extra-vars", "display_skipped_hosts=false",
-      "--extra-vars", "BUILD_USERNAME=${var.build_username}",
-      "--extra-vars", "BUILD_KEY='${var.build_key}'",
-      "--extra-vars", "ANSIBLE_USERNAME=${var.ansible_username}",
-      "--extra-vars", "ANSIBLE_KEY='${var.ansible_key}'",
-    ]
-  }
-
   post-processor "manifest" {
     output     = local.manifest_output
     strip_path = true
     strip_time = true
     custom_data = {
-      ansible_username         = var.ansible_username
       build_username           = var.build_username
       build_date               = local.build_date
       build_version            = local.build_version
@@ -219,23 +207,6 @@ build {
       vsphere_datastore        = var.vsphere_datastore
       vsphere_endpoint         = var.vsphere_endpoint
       vsphere_folder           = var.vsphere_folder
-    }
-  }
-
-  dynamic "hcp_packer_registry" {
-    for_each = var.common_hcp_packer_registry_enabled ? [1] : []
-    content {
-      bucket_name = local.bucket_name
-      description = local.bucket_description
-      bucket_labels = {
-        "os_family" : var.vm_guest_os_family,
-        "os_name" : var.vm_guest_os_name,
-        "os_version" : var.vm_guest_os_version,
-      }
-      build_labels = {
-        "build_version" : local.build_version,
-        "packer_version" : packer.version,
-      }
     }
   }
 }
