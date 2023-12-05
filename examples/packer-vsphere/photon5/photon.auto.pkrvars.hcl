@@ -31,9 +31,9 @@ vm_network_card          = "vmxnet3"
 // Removable Media Settings
 iso_path           = "packer_cache/"
 iso_file           = "photon-5.0-dde71ec57.x86_64.iso"
-iso_url            = "https://packages.vmware.com/photon/5.0/GA/iso/photon-5.0-dde71ec57.aarch64.iso"
+iso_url            = "https://packages.vmware.com/photon/5.0/GA/iso/photon-minimal-5.0-dde71ec57.x86_64.iso"
 iso_checksum_type  = "sha256"
-iso_checksum_value = "06f4b20d3097fcebc3ea067e41e4fb64ffe41828bdb9fa96cebc7a49f290c0d9"
+iso_checksum_value = "691d09eb61f8cad470f21c88287ff6b005c3be365c926a87577e714aee2d46bc"
 
 // Boot Settings
 vm_boot_order = "disk,cdrom"
