@@ -11,3 +11,5 @@ packer-plugin-mondoo
 packer-plugin-cnspec
 .docs
 centos-7-x86_64.vsphere.local.json
+examples/*/*/manifests/*
+examples/*/*/artifacts/*

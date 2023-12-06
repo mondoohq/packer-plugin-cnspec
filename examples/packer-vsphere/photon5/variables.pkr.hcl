@@ -371,3 +371,7 @@ variable "communicator_timeout" {
   type        = string
   description = "The timeout for the communicator protocol."
 }
+
+variable "vm_name" {
+  type = string
+}
