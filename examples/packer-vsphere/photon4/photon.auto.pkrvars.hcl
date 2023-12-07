@@ -29,11 +29,12 @@ vm_disk_thin_provisioned = true
 vm_network_card          = "vmxnet3"
 
 // Removable Media Settings
+// see https://github.com/vmware/photon/wiki/Downloading-Photon-OS
 iso_path           = "packer_cache/"
-iso_file           = "photon-5.0-dde71ec57.x86_64.iso"
-iso_url            = "https://packages.vmware.com/photon/5.0/GA/iso/photon-minimal-5.0-dde71ec57.x86_64.iso"
-iso_checksum_type  = "sha256"
-iso_checksum_value = "691d09eb61f8cad470f21c88287ff6b005c3be365c926a87577e714aee2d46bc"
+iso_file           = "photon-4.0-c001795b8.iso"
+iso_url            = "https://packages.vmware.com/photon/4.0/Rev2/iso/photon-4.0-c001795b8.iso"
+iso_checksum_type  = "md5"
+iso_checksum_value = "5af288017d0d1198dd6bd02ad40120eb"
 
 // Boot Settings
 vm_boot_order = "disk,cdrom"
