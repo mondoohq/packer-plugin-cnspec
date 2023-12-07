@@ -102,7 +102,7 @@ You can find example Packer templates in the [examples](/examples/) directory in
 
 ## Get Started with cnspec
 
-cnspec's benefits extend well beyond securing Packer builds! To start exploring, [get started](https://mondoo.com/docs/cnspec/) today!
+cnspec's benefits extend well beyond securing Packer builds! To start exploring, [download cnspec](https://mondoo.com/docs/cnspec/).
 
 ## Contributing
 
