@@ -183,6 +183,23 @@ source "vsphere-iso" "linux-photon" {
 build {
   sources = ["source.vsphere-iso.linux-photon"]
 
+  provisioner "cnspec" {
+    #on_failure      = "continue"
+    #score_threshold = 85
+    mondoo_config_path = "/Users/chris/.config/mondoo/acme-gcp.yml"
+    asset_name         = local.vm_name
+    debug = true
+    sudo {
+      active = true
+    }
+    annotations = {
+      build_date = local.build_date
+      os_family  = var.vm_guest_os_family
+      os_name    = var.vm_guest_os_name
+      os_version = var.vm_guest_os_version
+    }
+  }
+
   post-processor "manifest" {
     output     = local.manifest_output
     strip_path = true
