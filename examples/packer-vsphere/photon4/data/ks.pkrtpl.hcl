@@ -15,11 +15,12 @@
     "bootmode": "efi",
     "packages": [
         "minimal",
-        "linux",
+        "linux-esx",
         "initramfs",
         "sudo",
         "vim",
-        "cloud-utils"
+        "cloud-utils",
+        "parted"
     ],
     "postinstall": [
         "#!/bin/sh",
@@ -27,13 +28,9 @@
         "usermod -aG sudo ${build_username}",
         "echo \"${build_username} ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers.d/${build_username}",
         "chage -I -1 -m 0 -M 99999 -E -1 root",
-        "chage -I -1 -m 0 -M 99999 -E -1 ${build_username}",
-        "systemctl restart iptables",
-        "sed -i 's/.*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config",
-        "sed -i 's/.*MaxAuthTries.*/MaxAuthTries 10/g' /etc/ssh/sshd_config",
-        "systemctl restart sshd.service"
+        "chage -I -1 -m 0 -M 99999 -E -1 ${build_username}"
     ],
-    "linux_flavor": "linux",
+    "linux_flavor": "linux-esx",
     "network": {
         "type": "dhcp"
     }
