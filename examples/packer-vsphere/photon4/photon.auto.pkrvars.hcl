@@ -3,14 +3,14 @@
 
 /*
     DESCRIPTION:
-    VMware Photon OS 5 build variables.
+    VMware Photon OS 4 build variables.
     Packer Plugin for VMware vSphere: 'vsphere-iso' builder.
 */
 
 // Guest Operating Systtem Metadata
 vm_guest_os_family  = "linux"
 vm_guest_os_name    = "photon"
-vm_guest_os_version = "5.0"
+vm_guest_os_version = "4.0"
 
 // Virtual Machine Guest Operating Systtem Setting
 vm_guest_os_type = "vmwarePhoton64Guest"
@@ -38,7 +38,7 @@ iso_checksum_value = "5af288017d0d1198dd6bd02ad40120eb"
 
 // Boot Settings
 vm_boot_order = "disk,cdrom"
-vm_boot_wait  = "2s"
+vm_boot_wait  = "3s"
 
 // Communicator Settings
 communicator_port    = 22

@@ -183,6 +183,64 @@ source "vsphere-iso" "linux-photon" {
 build {
   sources = ["source.vsphere-iso.linux-photon"]
 
+  provisioner "shell" {
+    inline = [
+      "echo -e 'Starting patch cycle...'",
+      "sudo tdnf update -y"
+      ]
+  }
+
+  provisioner "shell" {
+    inline = [
+      # Amend the params set by default
+      "sudo sed -i 's/^ClientAliveCountMax.*/ClientAliveCountMax 3/g' /etc/ssh/sshd_config",
+      # Create a ssh banner
+      "echo -e '\n* This system is for the use of authorized users only. *\n' | sudo tee /etc/issue.net > /dev/null",
+      # Add additional sshd config
+      "echo -e '\n#\n# Added via Packer...\n#' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'PermitUserEnvironment no' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'PermitEmptyPasswords no' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'HostbasedAuthentication no' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'maxstartups 10:30:60' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'LogLevel INFO' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'IgnoreRhosts yes' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'DenyUsers root' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'LoginGraceTime 60' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'MaxSessions 4' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'MaxAuthTries 4' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'ClientAliveInterval 15' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+      "echo 'Banner /etc/issue.net' | sudo tee -a /etc/ssh/sshd_config > /dev/null",
+    ]
+  }
+
+  provisioner "shell" {
+    expect_disconnect = true
+    inline = [
+      "sudo reboot now",
+    ]
+    pause_after  = "10s"
+  }
+
+  provisioner "cnspec" {
+    #on_failure      = "continue"
+    #score_threshold = 85
+    #mondoo_config_path = "/Path/To/Mondoo/config.yml"
+    asset_name         = local.vm_name
+    debug = true
+    sudo {
+      active = true
+    }
+    annotations = {
+      build_date = local.build_date
+      os_family  = var.vm_guest_os_family
+      os_name    = var.vm_guest_os_name
+      os_version = var.vm_guest_os_version
+    }
+  }
+
   post-processor "manifest" {
     output     = local.manifest_output
     strip_path = true
