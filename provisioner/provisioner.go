@@ -396,7 +396,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if p.config.PolicyBundle != "" {
 		ui.Message("load policy bundle from: " + p.config.PolicyBundle)
 		var err error
-		policyBundle, err = policy.BundleFromPaths(p.config.PolicyBundle)
+		bundleLoader := policy.DefaultBundleLoader()
+		policyBundle, err = bundleLoader.BundleFromPaths(p.config.PolicyBundle)
 		if err != nil {
 			return errors.Wrap(err, "could not load policy bundle from "+p.config.PolicyBundle)
 		}
