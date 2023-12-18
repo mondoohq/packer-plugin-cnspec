@@ -233,6 +233,7 @@ build {
     sudo {
       active = true
     }
+
     annotations = {
       build_date = local.build_date
       os_family  = var.vm_guest_os_family
