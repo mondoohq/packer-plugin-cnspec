@@ -335,7 +335,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if p.config.Sudo != nil && p.config.Sudo.Active {
 		ui.Message("activated sudo")
 		assetConfig.Sudo = &inventory.Sudo{
-			Active: p.config.Sudo.Active,
+			Active:     p.config.Sudo.Active,
+			Executable: "sudo",
 		}
 	}
 
