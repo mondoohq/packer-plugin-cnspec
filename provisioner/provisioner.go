@@ -566,12 +566,10 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	ui.Message("scan completed successfully")
 
 	// render terminal output
+	buf := &bytes.Buffer{}
 	output := p.config.Output
-	r, err := reporter.New(output)
-	if err != nil {
-		return err
-	}
-	r.IsIncognito = p.config.Incognito
+	format := reporter.Formats[output]
+	r := reporter.NewReporter(format, p.config.Incognito).WithOutput(buf)
 
 	fullReport := result.GetFull()
 	if fullReport == nil {
@@ -579,8 +577,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		ui.Error(rErr.Error())
 		return rErr
 	}
-	buf := &bytes.Buffer{}
-	err = r.Print(fullReport, buf)
+
+	err = r.WriteReport(context.Background(), fullReport)
 	if err != nil {
 		return err
 	}
