@@ -1,3 +1,21 @@
+Type: `cnspec`
+
+Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows machine images for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
+
+## Basic Example
+```hcl
+provisioner "cnspec" {
+  on_failure          = "continue"
+  score_threshold     = 85
+  sudo {
+    active = true
+  }
+}
+```
+
+## Configuration Reference
+
+Optional Parameters:
 <!-- Code generated from the comments of the Config struct in provisioner/provisioner.go; DO NOT EDIT MANUALLY -->
 
 - `host_alias` (string) - The alias by which the host should be known.
@@ -42,7 +60,7 @@
   Mondoo Platform.
 
 - `incognito` (bool) - Configures incognito mode. Defaults to `true`. When set to false, scan results
-  will not be sent to the Mondoo Platform.
+  will not be sent to Mondoo Platform.
 
 - `policies` ([]string) - A list of policies to be executed (requires incognito mode).
 
@@ -63,6 +81,30 @@
 - `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to `0` which results in
   a passing score regardless of what scan results are returned.
 
-- `mondoo_config_path` (string) - The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
+- `mondoo_config_path` (string) - The path to the Mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
 
 <!-- End of code generated from the comments of the Config struct in provisioner/provisioner.go; -->
+
+
+### SudoConfig
+<!-- Code generated from the comments of the SudoConfig struct in provisioner/provisioner.go; DO NOT EDIT MANUALLY -->
+
+- `active` (bool) - Active
+
+<!-- End of code generated from the comments of the SudoConfig struct in provisioner/provisioner.go; -->
+
+
+## Get Started with cnspec
+
+If you are new to cnspec, check out [Get started with cnspec](https://mondoo.com/docs/cnspec/).
+
+## Packer plugin cnspec tutorial
+
+Check out the Packer tutorials on the Mondoo documentation site:
+
+- [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/cnspec/cnspec-aws/cnspec-aws-packer/) 
+- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cnspec-gcp/cnspec-gcp-packer/) 
+
+## Sample Packer Templates
+
+You can find example Packer templates in the [examples](https://github.com/mondoohq/packer-plugin-cnspec/tree/main/examples) directory in this repository.

@@ -1,3 +1,35 @@
+Type: `mondoo`
+
+>This plugin has been deprecated. Migrate to [Packer plugin cnspec by Mondoo](https://developer.hashicorp.com/packer/plugins/provisioner/mondoo/cnspec) for even easier security scanning of your Packer builds.
+
+The `mondoo` provisioner scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security
+policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of
+certified security policies which can be easily customize to meet your needs.
+
+Mondoo supports scanning of Linux, Windows, and macOS, as well as Docker containers.
+
+## Basic Example
+```hcl
+  provisioner "mondoo" {
+    on_failure          = "continue"
+    mondoo_config_path  = "/etc/mondoo-config.json"
+    score_threshold     = 85
+    asset_name          = "example-secure-base-image"
+    sudo {
+      active = true
+    }
+
+    annotations = {
+      Source_AMI    = "{{ .SourceAMI }}"
+      Creation_Date = "{{ .SourceAMICreationDate }}"
+    }
+  }
+}
+```
+
+## Configuration Reference
+
+Optional Parameters:
 <!-- Code generated from the comments of the Config struct in provisioner/provisioner.go; DO NOT EDIT MANUALLY -->
 
 - `host_alias` (string) - The alias by which the host should be known.
@@ -42,7 +74,7 @@
   Mondoo Platform.
 
 - `incognito` (bool) - Configures incognito mode. Defaults to `true`. When set to false, scan results
-  will not be sent to the Mondoo Platform.
+  will not be sent to Mondoo Platform.
 
 - `policies` ([]string) - A list of policies to be executed (requires incognito mode).
 
@@ -66,3 +98,25 @@
 - `mondoo_config_path` (string) - The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
 
 <!-- End of code generated from the comments of the Config struct in provisioner/provisioner.go; -->
+
+
+### SudoConfig
+<!-- Code generated from the comments of the SudoConfig struct in provisioner/provisioner.go; DO NOT EDIT MANUALLY -->
+
+- `active` (bool) - Active
+
+<!-- End of code generated from the comments of the SudoConfig struct in provisioner/provisioner.go; -->
+
+
+## Get Started with Mondoo
+
+If you are new to Mondoo you can get started by [signing up for a free account](https://mondoo.com/docs/tutorials/mondoo/account-setup/) today!
+
+Check out the Packer tutorials on the Mondoo documentation site:
+
+- [Building secure AMIs with Mondoo and Packer](https://mondoo.com/docs/cnspec/cnspec-aws/cnspec-aws-packer/) 
+- [Building secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cnspec-gcp/cnspec-gcp-packer/) 
+
+## Sample Packer Templates
+
+You can find example Packer templates in the [examples](https://github.com/mondoohq/packer-plugin-cnspec/tree/main/examples) directory in this repository.
