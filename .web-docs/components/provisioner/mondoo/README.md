@@ -68,7 +68,7 @@ Optional Parameters:
   If `score_threshold` is set to a value, and `on_failure = "continue"`
   builds will continue regardless of what score is returned.
 
-- `labels` (map[string]string) - Configure an optional map of labels for the asset data in Mondoo Platform.
+- `labels` (map[string]string) - Configure an optional map of labels for the asset data.
 
 - `annotations` (map[string]string) - Configure an optional map of `key/val` annotations for the asset data in
   Mondoo Platform.
