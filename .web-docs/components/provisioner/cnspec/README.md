@@ -54,7 +54,7 @@ Optional Parameters:
   If `score_threshold` is set to a value, and `on_failure = "continue"`
   builds will continue regardless of what score is returned.
 
-- `labels` (map[string]string) - Configure an optional map of labels for the asset data in Mondoo Platform.
+- `labels` (map[string]string) - Configure an optional map of labels for the asset data.
 
 - `annotations` (map[string]string) - Configure an optional map of `key/val` annotations for the asset data in
   Mondoo Platform.
@@ -81,7 +81,7 @@ Optional Parameters:
 - `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to `0` which results in
   a passing score regardless of what scan results are returned.
 
-- `mondoo_config_path` (string) - The path to the Mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
+- `mondoo_config_path` (string) - The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
 
 <!-- End of code generated from the comments of the Config struct in provisioner/provisioner.go; -->
 

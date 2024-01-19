@@ -82,7 +82,7 @@ type Config struct {
 	// If `score_threshold` is set to a value, and `on_failure = "continue"`
 	// builds will continue regardless of what score is returned.
 	OnFailure string `mapstructure:"on_failure"`
-	// Configure an optional map of labels for the asset data in Mondoo Platform.
+	// Configure an optional map of labels for the asset data.
 	Labels map[string]string `mapstructure:"labels"`
 	// Configure an optional map of `key/val` annotations for the asset data in
 	// Mondoo Platform.
