@@ -18,7 +18,6 @@ type FlatConfig struct {
 	PackerOnError        *string           `mapstructure:"packer_on_error" cty:"packer_on_error" hcl:"packer_on_error"`
 	PackerUserVars       map[string]string `mapstructure:"packer_user_variables" cty:"packer_user_variables" hcl:"packer_user_variables"`
 	PackerSensitiveVars  []string          `mapstructure:"packer_sensitive_variables" cty:"packer_sensitive_variables" hcl:"packer_sensitive_variables"`
-	Command              *string           `cty:"command" hcl:"command"`
 	HostAlias            *string           `mapstructure:"host_alias" cty:"host_alias" hcl:"host_alias"`
 	User                 *string           `mapstructure:"user" cty:"user" hcl:"user"`
 	LocalPort            *uint             `mapstructure:"local_port" cty:"local_port" hcl:"local_port"`
@@ -62,7 +61,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"packer_on_error":            &hcldec.AttrSpec{Name: "packer_on_error", Type: cty.String, Required: false},
 		"packer_user_variables":      &hcldec.AttrSpec{Name: "packer_user_variables", Type: cty.Map(cty.String), Required: false},
 		"packer_sensitive_variables": &hcldec.AttrSpec{Name: "packer_sensitive_variables", Type: cty.List(cty.String), Required: false},
-		"command":                    &hcldec.AttrSpec{Name: "command", Type: cty.String, Required: false},
 		"host_alias":                 &hcldec.AttrSpec{Name: "host_alias", Type: cty.String, Required: false},
 		"user":                       &hcldec.AttrSpec{Name: "user", Type: cty.String, Required: false},
 		"local_port":                 &hcldec.AttrSpec{Name: "local_port", Type: cty.Number, Required: false},
