@@ -4,9 +4,9 @@ name: Build Packer Plugin
 on:
   push:
     paths:
-      - '**.go'
-      - '**.mod'
-      - 'go.sum'
+      - "**.go"
+      - "**.mod"
+      - "go.sum"
 
 jobs:
   license-check:
