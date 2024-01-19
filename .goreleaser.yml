@@ -22,7 +22,7 @@ builds:
       - arm64
       - arm
     ldflags:
-      - -s -w -X go.mondoo.com/cnquery/v9.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}}
+      - -s -w -X go.mondoo.com/cnquery/v10.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}}
   - id: packer-plugin-cnspec-windows
     binary: 'packer-plugin-cnspec_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     goos:
@@ -31,7 +31,7 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w -X go.mondoo.com/cnquery/v9.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}}
+      - -s -w -X go.mondoo.com/cnquery/v10.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}}
   - id: packer-plugin-cnspec-darwin
     binary: 'packer-plugin-cnspec_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
     goos:
@@ -40,7 +40,7 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w -X go.mondoo.com/cnquery/v9.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}} 
+      - -s -w -X go.mondoo.com/cnquery/v10.Version={{ .Env.CNSPEC_VERSION }} -X go.mondoo.com/packer-plugin-cnspec/version.Version={{.Version}} -X go.mondoo.com/packer-plugin-cnspec/version.Build={{.ShortCommit}} -X go.mondoo.com/packer-plugin-cnspec/version.Date={{.Date}} 
   
   # building fall-back binaries
   - id: packer-plugin-mondoo
