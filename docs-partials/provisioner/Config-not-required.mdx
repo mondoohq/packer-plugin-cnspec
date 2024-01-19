@@ -60,8 +60,10 @@
 - `use_proxy` (bool) - Use proxy to connect to host to scan. This configuration will fall-back to
   packer proxy for cases where the provisioner cannot access the target directly
 
-- `output` (string) - Set output format: summary, full, yaml, json, csv, compact, report, junit
+- `output` (string) - Set output format: compact, csv, full, json, junit, report, summary, yaml
   (default "compact")
+
+- `output_target` (string) - Set output target. E.g. path to local file
 
 - `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to
   `0` which results in a passing score regardless of what scan results are

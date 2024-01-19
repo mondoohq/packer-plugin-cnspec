@@ -104,9 +104,11 @@ type Config struct {
 	// Use proxy to connect to host to scan. This configuration will fall-back to
 	// packer proxy for cases where the provisioner cannot access the target directly
 	UseProxy bool `mapstructure:"use_proxy"`
-	// Set output format: summary, full, yaml, json, csv, compact, report, junit
+	// Set output format: compact, csv, full, json, junit, report, summary, yaml
 	// (default "compact")
 	Output string `mapstructure:"output"`
+	// Set output target. E.g. path to local file
+	OutputTarget string `mapstructure:"output_target"`
 	// An integer value to set the `score_threshold` of mondoo scans. Defaults to
 	// `0` which results in a passing score regardless of what scan results are
 	// returned.
@@ -523,12 +525,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 
 	updateProviders(ui)
 
-	var result *scan.ScanResult
+	var res *scan.ScanResult
 	var err error
 	if p.config.Incognito {
 		ui.Message("scan packer build in incognito mode")
 		scanService := scan.NewLocalScanner()
-		result, err = scanService.RunIncognito(context.Background(), scanJob)
+		res, err = scanService.RunIncognito(context.Background(), scanJob)
 		if err != nil {
 			return err
 		}
@@ -555,33 +557,39 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 
 		ui.Message("scan packer build")
 		scanService := scan.NewLocalScanner(scannerOpts...)
-		result, err = scanService.Run(context.Background(), scanJob)
+		res, err = scanService.Run(context.Background(), scanJob)
 		if err != nil {
 			ui.Error("scan failed: " + err.Error())
 			return err
 		}
 	}
 
+	report := res.GetFull()
 	ui.Message("scan completed successfully")
 
 	// render terminal output
-	buf := &bytes.Buffer{}
-	output := p.config.Output
-	format := reporter.Formats[output]
-	r := reporter.NewReporter(format, p.config.Incognito).WithOutput(buf)
-
-	fullReport := result.GetFull()
-	if fullReport == nil {
-		rErr := errors.New("could not gather the full report")
-		ui.Error(rErr.Error())
-		return rErr
+	handlerConf := reporter.HandlerConfig{
+		Format:       p.config.Output,
+		OutputTarget: p.config.OutputTarget,
+		Incognito:    p.config.Incognito,
 	}
-
-	err = r.WriteReport(context.Background(), fullReport)
+	outputHandler, err := reporter.NewOutputHandler(handlerConf)
 	if err != nil {
-		return err
+		ui.Error("failed to create an output handler: " + err.Error())
 	}
-	ui.Message(buf.String())
+
+	buf := &bytes.Buffer{}
+	if x, ok := outputHandler.(*reporter.Reporter); ok {
+		x.WithOutput(buf)
+	}
+
+	if err := outputHandler.WriteReport(context.Background(), report); err != nil {
+		ui.Error("failed to write report to output target: " + err.Error())
+	}
+
+	if buf.Len() > 0 {
+		ui.Message(buf.String())
+	}
 
 	// default is to pass all controls
 	scoreThreshold := 100
@@ -593,8 +601,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		scoreThreshold = p.config.ScoreThreshold
 	}
 
-	if fullReport.GetWorstScore() < uint32(scoreThreshold) {
-		return fmt.Errorf("scan has completed with %d score, does not pass score threshold %d", fullReport.GetWorstScore(), scoreThreshold)
+	if report.GetWorstScore() < uint32(scoreThreshold) {
+		return fmt.Errorf("scan has completed with %d score, does not pass score threshold %d", report.GetWorstScore(), scoreThreshold)
 	}
 
 	return nil

@@ -7,7 +7,7 @@ env:
 before:
   hooks:
     - go mod download
-    - make ci-release-docs
+    - make generate
     # Check plugin compatibility with required version of the Packer SDK
     - make plugin-check
 builds:
