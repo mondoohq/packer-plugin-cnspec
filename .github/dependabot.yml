@@ -1,15 +1,21 @@
----
 version: 2
 updates:
   - package-ecosystem: gomod
-    directory: /
+    directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
+    groups:
+      gomodupdates:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
     allow:
       - dependency-name: "github.com/hashicorp/packer-plugin-sdk"
       - dependency-name: "github.com/hashicorp/hcl/v2"
       - dependency-name: "github.com/zclconf/go-cty"
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
