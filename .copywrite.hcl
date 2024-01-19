@@ -14,5 +14,6 @@ project {
     "**/*.pb.go",
     "**/*_string.go",
     "**/*pkrtpl.hcl",
+    "**/.web-docs/**",
   ]
 }

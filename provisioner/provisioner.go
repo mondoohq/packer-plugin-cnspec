@@ -44,8 +44,6 @@ import (
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 	ctx                 interpolate.Context
-	// The command to invoke mondoo. Defaults to `mondoo scan`.
-	Command string
 	// The alias by which the host should be known.
 	// Defaults to `default`.
 	HostAlias string `mapstructure:"host_alias"`
@@ -82,34 +80,39 @@ type Config struct {
 	// If `score_threshold` is set to a value, and `on_failure = "continue"`
 	// builds will continue regardless of what score is returned.
 	OnFailure string `mapstructure:"on_failure"`
-	// Configure an optional map of labels for the asset data.
+	// Configure an optional map of `key/val` labels for the asset in
+	// Mondoo Platform.
 	Labels map[string]string `mapstructure:"labels"`
-	// Configure an optional map of `key/val` annotations for the asset data in
+	// Configure an optional map of `key/val` annotations for the asset in
 	// Mondoo Platform.
 	Annotations map[string]string `mapstructure:"annotations"`
-	// Configures incognito mode. Defaults to `true`. When set to false, scan results
-	// will not be sent to Mondoo Platform.
+	// Configures incognito mode. By default it detects if a Mondoo service account
+	// is available. When set to false, scan results will not be sent to
+	// Mondoo Platform.
 	Incognito bool `mapstructure:"incognito"`
-	// A list of policies to be executed (requires incognito mode).
+	// A list of policies to be executed (will automatically activate incognito mode).
 	Policies []string `mapstructure:"policies"`
 	// A path to local policy bundle file.
 	PolicyBundle string `mapstructure:"policybundle"`
-	// Run mondoo scan with `--sudo`. Defaults to none.
+	// Runs scan with `--sudo`. Defaults to none.
 	Sudo *SudoConfig `mapstructure:"sudo"`
 	// Configure WinRM user. Defaults to `user` set by the packer communicator.
 	WinRMUser string `mapstructure:"winrm_user"`
-	// Configure WinRM user password. Defaults to `password` set by the packer communicator.
+	// Configure WinRM user password. Defaults to `password` set by the packer
+	// communicator.
 	WinRMPassword string `mapstructure:"winrm_password"`
-	// Use proxy to connect to host to scan. This configuration will fall-back to packer proxy
-	// for cases where the provisioner cannot access the target directly
-	// NOTE: we have seen cases with the vsphere builder
+	// Use proxy to connect to host to scan. This configuration will fall-back to
+	// packer proxy for cases where the provisioner cannot access the target directly
 	UseProxy bool `mapstructure:"use_proxy"`
-	// Set output format: summary, full, yaml, json, csv, compact, report, junit (default "compact")
+	// Set output format: summary, full, yaml, json, csv, compact, report, junit
+	// (default "compact")
 	Output string `mapstructure:"output"`
-	// An integer value to set the `score_threshold` of mondoo scans. Defaults to `0` which results in
-	// a passing score regardless of what scan results are returned.
+	// An integer value to set the `score_threshold` of mondoo scans. Defaults to
+	// `0` which results in a passing score regardless of what scan results are
+	// returned.
 	ScoreThreshold int `mapstructure:"score_threshold"`
-	// The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
+	// The path to the Mondoo's service account. Defaults to
+	// `$HOME/.config/mondoo/mondoo.yml`
 	MondooConfigPath string `mapstructure:"mondoo_config_path"`
 }
 
@@ -152,10 +155,6 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 	}, raws...)
 	if err != nil {
 		return err
-	}
-
-	if p.config.Command == "" {
-		p.config.Command = "mondoo"
 	}
 
 	var errs *packer.MultiError

@@ -54,34 +54,39 @@ Optional Parameters:
   If `score_threshold` is set to a value, and `on_failure = "continue"`
   builds will continue regardless of what score is returned.
 
-- `labels` (map[string]string) - Configure an optional map of labels for the asset data.
-
-- `annotations` (map[string]string) - Configure an optional map of `key/val` annotations for the asset data in
+- `labels` (map[string]string) - Configure an optional map of `key/val` labels for the asset in
   Mondoo Platform.
 
-- `incognito` (bool) - Configures incognito mode. Defaults to `true`. When set to false, scan results
-  will not be sent to Mondoo Platform.
+- `annotations` (map[string]string) - Configure an optional map of `key/val` annotations for the asset in
+  Mondoo Platform.
 
-- `policies` ([]string) - A list of policies to be executed (requires incognito mode).
+- `incognito` (bool) - Configures incognito mode. By default it detects if a Mondoo service account
+  is available. When set to false, scan results will not be sent to
+  Mondoo Platform.
+
+- `policies` ([]string) - A list of policies to be executed (will automatically activate incognito mode).
 
 - `policybundle` (string) - A path to local policy bundle file.
 
-- `sudo` (\*SudoConfig) - Run mondoo scan with `--sudo`. Defaults to none.
+- `sudo` (\*SudoConfig) - Runs scan with `--sudo`. Defaults to none.
 
 - `winrm_user` (string) - Configure WinRM user. Defaults to `user` set by the packer communicator.
 
-- `winrm_password` (string) - Configure WinRM user password. Defaults to `password` set by the packer communicator.
+- `winrm_password` (string) - Configure WinRM user password. Defaults to `password` set by the packer
+  communicator.
 
-- `use_proxy` (bool) - Use proxy to connect to host to scan. This configuration will fall-back to packer proxy
-  for cases where the provisioner cannot access the target directly
-  NOTE: we have seen cases with the vsphere builder
+- `use_proxy` (bool) - Use proxy to connect to host to scan. This configuration will fall-back to
+  packer proxy for cases where the provisioner cannot access the target directly
 
-- `output` (string) - Set output format: summary, full, yaml, json, csv, compact, report, junit (default "compact")
+- `output` (string) - Set output format: summary, full, yaml, json, csv, compact, report, junit
+  (default "compact")
 
-- `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to `0` which results in
-  a passing score regardless of what scan results are returned.
+- `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to
+  `0` which results in a passing score regardless of what scan results are
+  returned.
 
-- `mondoo_config_path` (string) - The path to the mondoo client config. Defaults to `$HOME/.config/mondoo/mondoo.yml`
+- `mondoo_config_path` (string) - The path to the Mondoo's service account. Defaults to
+  `$HOME/.config/mondoo/mondoo.yml`
 
 <!-- End of code generated from the comments of the Config struct in provisioner/provisioner.go; -->
 
