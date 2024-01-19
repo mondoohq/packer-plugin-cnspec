@@ -24,4 +24,3 @@ jobs:
           remote-organization-name: mondoohq
           branch: "main"
           allowlist: mondoo-tools,github-actions[bot],dependabot[bot]
-

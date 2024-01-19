@@ -1,5 +1,5 @@
 # Manual release workflow is used for deploying documentation updates
-# on the specified branch without making an official plugin release. 
+# on the specified branch without making an official plugin release.
 name: Notify Integration Release (Manual)
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
         required: false
       branch:
         description: "A branch or SHA"
-        default: 'main'
+        default: "main"
         required: false
 jobs:
   notify-release:

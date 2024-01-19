@@ -2,7 +2,7 @@ name: Notify Integration Release (Tag)
 on:
   push:
     tags:
-      - '*.*.*'   # Proper releases
+      - "*.*.*" # Proper releases
 jobs:
   strip-version:
     runs-on: ubuntu-latest
