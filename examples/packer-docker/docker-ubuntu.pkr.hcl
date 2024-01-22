@@ -45,5 +45,7 @@ build {
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"
     }
+    output = "junit"
+    output_target = "test-results.xml"
   }
 }
