@@ -25,7 +25,12 @@ jobs:
         with:
           ref: ${{ github.ref }}
       # Ensure that Docs are Compiled
+      - name: Import environment variables from file
+        run: cat ".github/env" >> $GITHUB_ENV
       - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
+        with:
+          go-version: ">=${{ env.golang-version }}"
+          cache: false
       - shell: bash
         run: make generate
       - shell: bash
