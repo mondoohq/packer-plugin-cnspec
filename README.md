@@ -36,14 +36,18 @@ To install Packer Plugin cnspec:
 packer {
   required_plugins {
     cnspec = {
-      version = ">= 9.0.0"
+      version = ">= 10.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
 }
 ```
 
-2. Run this command: `packer init`
+2. Run this command:
+
+```bash
+packer init /path/to/template.pkr.hcl
+```
 
 ### Install manually
 

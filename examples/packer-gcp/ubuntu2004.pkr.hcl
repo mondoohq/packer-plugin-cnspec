@@ -8,7 +8,7 @@ packer {
       source  = "github.com/hashicorp/googlecompute"
     }
     cnspec = {
-      version = ">= 9.0.0"
+      version = ">= 10.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
