@@ -5,7 +5,7 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 1.1.0"
+      version = ">= 1.2.0"
       source  = "github.com/hashicorp/amazon"
     }
     cnspec = {
@@ -23,7 +23,7 @@ variable "aws_region" {
 variable "image_prefix" {
   type = string
   description = "Prefix to be applied to image name"
-  default = "mondoo-amazon-linux-2-secure-base"
+  default = "mondoo-amazon-linux-2023-secure-base"
 }
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
@@ -34,7 +34,7 @@ source "amazon-ebs" "amazon2" {
   region        = var.aws_region
   source_ami_filter {
     filters = {
-      name                = "amzn2-ami-kernel-5.*-x86_64-gp2"
+      name                = "al2023-ami-2023.3.20*-x86_64"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -75,4 +75,3 @@ build {
     }
   }
 }
-
