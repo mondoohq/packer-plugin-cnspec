@@ -32,6 +32,7 @@ import (
 	"go.mondoo.com/cnquery/v10/providers"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/inventory"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/upstream"
+	"go.mondoo.com/cnquery/v10/providers-sdk/v1/upstream/health"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/vault"
 	cnspec_config "go.mondoo.com/cnspec/v10/apps/cnspec/cmd/config"
 	"go.mondoo.com/cnspec/v10/cli/reporter"
@@ -192,6 +193,9 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 }
 
 func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.Communicator, generatedData map[string]interface{}) error {
+	defer health.ReportPanic("packer-plugin-cnspec", version.Version, version.Build, func(product, version, build string, r any, stacktrace []byte) {
+		ui.Error(fmt.Sprintf("panic: %v\n%s", r, stacktrace))
+	})
 	ui.Say("Running cnspec packer provisioner by Mondoo (Version: " + version.Version + ", Build: " + version.Build + ")")
 
 	err := mapstructure.Decode(generatedData, &p.buildInfo)
