@@ -532,6 +532,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		scanService := scan.NewLocalScanner()
 		res, err = scanService.RunIncognito(context.Background(), scanJob)
 		if err != nil {
+			ui.Error("scan failed: " + err.Error())
 			return err
 		}
 	} else {
@@ -561,6 +562,17 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		if err != nil {
 			ui.Error("scan failed: " + err.Error())
 			return err
+		}
+	}
+
+	if res == nil {
+		ui.Error("scan failed: no result returned, enable debug logging for more details")
+		return errors.New("scan failed: no result returned")
+	}
+
+	if x := res.GetErrors(); x != nil {
+		for k := range x.Errors {
+			ui.Error(fmt.Sprintf("scan asset %s failed: %v", k, x.Errors[k]))
 		}
 	}
 
