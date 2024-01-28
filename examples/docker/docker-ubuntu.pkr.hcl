@@ -5,7 +5,7 @@ packer {
   required_plugins {
     docker = {
       version = ">= 0.0.7"
-      source = "github.com/hashicorp/docker"
+      source  = "github.com/hashicorp/docker"
     }
     cnspec = {
       version = ">= 10.0.0"
@@ -40,12 +40,17 @@ build {
   }
 
   provisioner "cnspec" {
-    on_failure = "continue"
-    asset_name = "${var.image_prefix}-${local.timestamp}"
+    on_failure  = "continue"
+    asset_name  = "${var.image_prefix}-${local.timestamp}"
     annotations = {
-      Name          = "${var.image_prefix}-${local.timestamp}"
+      Name              = "${var.image_prefix}-${local.timestamp}"
+      Description       = "Mondoo Secure Ubuntu 20.04 Base Image"
+      # see https://developer.hashicorp.com/packer/docs/templates/hcl_templates/contextual-variables#build-variables
+      Build             = "${ build.PackerRunUUID }"
+      Source            = "${ source.name }"
+      SourceImageDigest = "${ build.SourceImageDigest }"
     }
-    output = "junit"
+    output        = "junit"
     output_target = "test-results.xml"
   }
 }
