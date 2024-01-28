@@ -327,7 +327,6 @@ func (p *Provisioner) ConfigSpec() hcldec.ObjectSpec {
 }
 
 func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) error {
-
 	assetConfig := &inventory.Config{
 		Type:    "unkown",
 		Options: map[string]string{},
@@ -437,8 +436,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	debugLogBuffer := &bytes.Buffer{}
 	logger.SetWriter(debugLogBuffer)
 	if p.config.Debug {
-		data, _ := json.Marshal(scanJob)
-		ui.Message(fmt.Sprintf("cnspec job configuration: %v", string(data)))
+		raw, err := json.MarshalIndent(scanJob, "", "  ")
+		if err != nil {
+			ui.Error("failed to dump JSON:" + err.Error())
+		}
+
+		ui.Message(fmt.Sprintf("cnspec job configuration: %v", string(raw)))
 
 		// configure stderr logger
 		logger.Set("debug")
@@ -447,6 +450,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		defer func() {
 			ui.Message(debugLogBuffer.String())
 		}()
+
+		DumpLocal := "./mondoo-debug-"
+		name := p.config.AssetName
+
+		err = os.WriteFile(DumpLocal+name+".json", []byte(raw), 0o644)
+		if err != nil {
+			ui.Error("failed to dump JSON" + err.Error())
+		}
 	}
 
 	// base 64 config env setting has always precedence
