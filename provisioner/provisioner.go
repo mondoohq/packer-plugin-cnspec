@@ -523,10 +523,18 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
-	updateProviders(ui)
+	provider, err := providers.EnsureProvider(providers.ProviderLookup{
+		ID: "go.mondoo.com/cnquery/v9/providers/os",
+	}, true, nil)
+	if err != nil {
+		ui.Error("could not load OS providers: " + err.Error())
+		if err != nil {
+			return err
+		}
+	}
+	ui.Message("use OS provider version " + provider.Version + " (" + provider.Path + ")")
 
 	var res *scan.ScanResult
-	var err error
 	if p.config.Incognito {
 		ui.Message("scan packer build in incognito mode")
 		scanService := scan.NewLocalScanner()
@@ -606,37 +614,4 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	return nil
-}
-
-func updateProviders(ui packer.Ui) {
-	allProviders, err := providers.ListActive()
-	if err != nil {
-		ui.Error(err.Error())
-		ui.Message("failed to list providers, not going to update cnspec providers")
-		return
-	}
-	updatedProviders := []*providers.Provider{}
-	for _, provider := range allProviders {
-		if provider.Name == "mock" || provider.Name == "core" {
-			continue
-		}
-		latestVersion, err := providers.LatestVersion(provider.Name)
-		if err != nil {
-			ui.Error(err.Error())
-			ui.Message("failed to determine latest version for " + provider.Name + " provider, not going to update it")
-			continue
-		}
-		if latestVersion != provider.Version {
-			installed, err := providers.Install(provider.Name, "")
-			if err != nil {
-				ui.Error(err.Error())
-				ui.Message("failed to install/update " + provider.Name + " provider")
-				continue
-			}
-			updatedProviders = append(updatedProviders, installed)
-		}
-	}
-	for _, p := range updatedProviders {
-		ui.Message("successfully installed " + p.Name + " provider" + " version=" + p.Version + " path=" + p.Path)
-	}
 }
