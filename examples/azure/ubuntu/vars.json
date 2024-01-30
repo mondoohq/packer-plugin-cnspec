@@ -1,4 +1,4 @@
 {
-  "subscription_id": "<subscription_id>",
-  "resource_group_name": "<resource_group>"
+  "image_name": "packer-test-vm-image",
+  "resource_group_name": "test-vm_group"
 }

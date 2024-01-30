@@ -4,7 +4,7 @@
   },
   "provisioners": [
     {
-      "type": "mondoo",
+      "type": "cnspec",
       "on_failure": "continue"
     }
   ],
