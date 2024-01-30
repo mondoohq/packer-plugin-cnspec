@@ -19,16 +19,6 @@ locals {
   date   = timestamp()
 }
 
-variable "tenantId" {
-  type = string
-  description = "The Azure tenant ID"
-}
-
-variable "subscriptionId" {
-  type = string
-  description = "The Azure subscription ID"
-}
-
 variable "location" {
   type = string
   description = "The Azure region to deploy to"
@@ -37,11 +27,6 @@ variable "location" {
 variable "resourceGroup" {
   type = string
   description = "The Azure resource group to deploy to"
-}
-
-variable "galleryName" {
-  type = string
-  description = "The Azure Shared Image Gallery name"
 }
 
 variable "imageName" {
