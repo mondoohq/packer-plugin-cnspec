@@ -39,11 +39,6 @@ variable "resourceGroup" {
   description = "The Azure resource group to deploy to"
 }
 
-variable "galleryName" {
-  type = string
-  description = "The Azure Shared Image Gallery name"
-}
-
 variable "imageName" {
   type = string
   description = "The Azure Shared Image Gallery image name"
