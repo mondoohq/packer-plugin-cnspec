@@ -25,7 +25,9 @@ variable "image_prefix" {
   default     = "mondoo-ubuntu-22.04-secure-base"
 }
 
-locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
+locals {
+  timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+}
 
 source "amazon-ebs" "ubuntu2204" {
   ami_name      = "${var.image_prefix}-${local.timestamp}"
@@ -41,17 +43,16 @@ source "amazon-ebs" "ubuntu2204" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
-  tags = {
-    Base_AMI_Name = "{{ .SourceAMIName }}"
+  tags         = {
     Name          = "${var.image_prefix}-${local.timestamp}"
     Source_AMI    = "{{ .SourceAMI }}"
+    Base_AMI_Name = "{{ .SourceAMIName }}"
     Creation_Date = "{{ .SourceAMICreationDate }}"
   }
 }
 
 build {
   name = "${var.image_prefix}-${local.timestamp}"
-
   sources = [
     "source.amazon-ebs.ubuntu2204"
   ]
@@ -70,9 +71,9 @@ build {
 
     annotations = {
       Name          = "${var.image_prefix}-${local.timestamp}"
-      Base_AMI_Name = "{{ .SourceAMIName }}"
-      Source_AMI    = "{{ .SourceAMI }}"
-      Creation_Date = "{{ .SourceAMICreationDate }}"
+      Base_AMI_Name = "${ build.SourceAMIName }"
+      Source_AMI    = "${ build.SourceAMI }"
+      Creation_Date = "${ build.SourceAMICreationDate }"
     }
   }
 }
