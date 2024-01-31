@@ -372,6 +372,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		} else if len(p.buildInfo.SSHPrivateKey) > 0 {
 			cred := vault.NewPrivateKeyCredential(p.buildInfo.User, []byte(p.buildInfo.SSHPrivateKey), "")
 			assetConfig.Credentials = append(assetConfig.Credentials, cred)
+		} else if p.buildInfo.SSHAgentAuth {
+			cred := &vault.Credential{
+				Type: vault.CredentialType_ssh_agent,
+				User: p.buildInfo.User,
+			}
+			assetConfig.Credentials = append(assetConfig.Credentials, cred)
 		} else {
 			// fallback to password auth
 			cred := vault.NewPasswordCredential(p.buildInfo.User, p.buildInfo.Password)
