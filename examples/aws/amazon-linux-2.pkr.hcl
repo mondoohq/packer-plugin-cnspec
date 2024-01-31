@@ -21,12 +21,14 @@ variable "aws_region" {
 }
 
 variable "image_prefix" {
-  type = string
+  type        = string
   description = "Prefix to be applied to image name"
-  default = "mondoo-amazon-linux-2-secure-base"
+  default     = "mondoo-amazon-linux-2-secure-base"
 }
 
-locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
+locals {
+  timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+}
 
 source "amazon-ebs" "amazon2" {
   ami_name      = "${var.image_prefix}-${local.timestamp}"
@@ -42,10 +44,10 @@ source "amazon-ebs" "amazon2" {
     owners      = ["137112412989"]
   }
   ssh_username = "ec2-user"
-  tags = {
-    Base_AMI_Name = "{{ .SourceAMIName }}"
+  tags         = {
     Name          = "${var.image_prefix}-${local.timestamp}"
     Source_AMI    = "{{ .SourceAMI }}"
+    Base_AMI_Name = "{{ .SourceAMIName }}"
     Creation_Date = "{{ .SourceAMICreationDate }}"
   }
 }
@@ -70,8 +72,10 @@ build {
       active = true
     }
     annotations = {
-      Source_AMI    = "{{ .SourceAMI }}"
-      Creation_Date = "{{ .SourceAMICreationDate }}"
+      Name          = "${var.image_prefix}-${local.timestamp}"
+      Base_AMI_Name = "${ build.SourceAMIName }"
+      Source_AMI    = "${ build.SourceAMI }"
+      Creation_Date = "${ build.SourceAMICreationDate }"
     }
   }
 }
