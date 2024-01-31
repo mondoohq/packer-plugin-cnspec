@@ -588,19 +588,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
-	if res == nil {
-		ui.Error("scan failed: no result returned, enable debug logging for more details")
+	if res == nil || res.GetFull() == nil {
+		ui.Error("scan failed: no result returned, use `debug: true` logging for more details")
 		return errors.New("scan failed: no result returned")
 	}
 
-	if x := res.GetErrors(); x != nil {
-		for k := range x.Errors {
-			ui.Error(fmt.Sprintf("scan asset %s failed: %v", k, x.Errors[k]))
-		}
-	}
-
 	report := res.GetFull()
-	ui.Message("scan completed successfully")
 
 	// render terminal output
 	handlerConf := reporter.HandlerConfig{
@@ -639,6 +632,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if report.GetWorstScore() < uint32(scoreThreshold) {
 		return fmt.Errorf("scan has completed with %d score, does not pass score threshold %d", report.GetWorstScore(), scoreThreshold)
 	}
+
+	if len(report.Errors) > 0 {
+		return errors.New("scan failed with errors, use `debug: true` logging for more details")
+	}
+
+	ui.Message("scan completed successfully")
 
 	return nil
 }
