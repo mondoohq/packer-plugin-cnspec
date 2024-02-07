@@ -3,3 +3,11 @@ pkrvars
 pkr
 linux
 mkpasswd
+quickview
+testcase
+testsuite
+classname
+acf
+bqjbhq
+cec
+fbf
