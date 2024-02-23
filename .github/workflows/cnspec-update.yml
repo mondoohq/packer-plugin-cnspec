@@ -1,0 +1,86 @@
+name: Bump cnspec
+
+on:
+  repository_dispatch:
+    types: [update-cnspec]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "cnspec version"
+        required: true
+        type: string
+
+jobs:
+  bump-cnspec:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # Use SSH keys for checking out the code
+      # https://github.com/peter-evans/create-pull-request/issues/48
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#push-using-ssh-deploy-keys
+      # tl;dr:
+      # The GITHUB_TOKEN is limited when creating PRs from a workflow because of that we use SSH keys for which the
+      # limitations do not apply
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
+
+      # Determine which version should be released based on event type
+      - name: Set Version (Workflow Dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo VERSION=${{ inputs.version }} >> $GITHUB_ENV
+      - name: Set Version (Repository Dispatch)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo VERSION=${{ github.event.client_payload.version }} >> $GITHUB_ENV
+      - name: Unified Version
+        id: version
+        run: |
+          echo "Version: $VERSION"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Import environment variables from file
+        run: cat ".github/env" >> $GITHUB_ENV
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=${{ env.golang-version }}"
+          cache: false
+      - name: Bump cnspec
+        run: |
+          MAJOR=$(echo "${{ steps.version.outputs.version }}" | cut -d. -f1)
+          go get go.mondoo.com/cnspec/${MAJOR}@${{ steps.version.outputs.version }}
+          go mod tidy
+
+      - name: Prepare title and branch name
+        id: branch
+        run: |
+          BRANCH_NAME="version/cnspec_update_${{ steps.version.outputs.version }}"
+          COMMIT_MSG="🧹 Bump cnspec to ${{ steps.version.outputs.version }}"
+          echo "COMMIT_TITLE=${COMMIT_MSG}" >> $GITHUB_OUTPUT
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create PR
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: main
+          labels: dependencies,go
+          committer: "Mondoo Tools <tools@mondoo.com>"
+          commit-message: ${{ steps.branch.outputs.COMMIT_TITLE }}
+          author: "Mondoo Tools <tools@mondoo.com>"
+          title: ${{ steps.branch.outputs.COMMIT_TITLE }}
+          branch: ${{ steps.branch.outputs.BRANCH_NAME }}
+          body-path: .github/pr-body.md
+
+      - name: PR infos
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+
