@@ -1203,6 +1203,8 @@ go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=
 go.mondoo.com/cnquery/v10 v10.9.1 h1:E0CHShKmq2ijX0AFSaFzrHqusm/6XmYc3EtwVp9Gi48=
 go.mondoo.com/cnquery/v10 v10.9.1/go.mod h1:aAcCZ6modg4DYeDTdeaeGtiQGbEjYExfjm6frUD3efY=
+go.mondoo.com/cnquery/v10 v10.9.2-0.20240326161610-cd544f00a38c h1:N5h8KrI9vmx/F5BMyQyRzM2lEM8VL2uxce5coj3CpsA=
+go.mondoo.com/cnquery/v10 v10.9.2-0.20240326161610-cd544f00a38c/go.mod h1:aAcCZ6modg4DYeDTdeaeGtiQGbEjYExfjm6frUD3efY=
 go.mondoo.com/cnspec/v10 v10.9.1 h1:0HNj9fOTwnpRzGAWa/HyfE+FA0CUVEMhaD3OT6sRywA=
 go.mondoo.com/cnspec/v10 v10.9.1/go.mod h1:co2pznLRIVElPeHd/XdoNSkpE0OsBWwaR25jzrnaSXo=
 go.mondoo.com/mondoo-go v0.0.0-20240312054001-2ab23a39b500 h1:HjtfupqfqKnDaK+XUXZC/3JyIwK09C3TFNggwReuDlY=
