@@ -553,6 +553,18 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 			return err
 		}
 	}
+
+	updated, err := providers.TryProviderUpdate(provider, providers.UpdateProvidersConfig{
+		Enabled:         true,
+		RefreshInterval: 60 * 60,
+	})
+	if err != nil {
+		ui.Error("failed to update provider, fallback to existing one: " + err.Error())
+	} else {
+		ui.Message("successfully updated OS provider")
+		provider = updated
+	}
+
 	ui.Message("use OS provider version " + provider.Version + " (" + provider.Path + ")")
 
 	var res *scan.ScanResult
