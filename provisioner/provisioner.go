@@ -31,6 +31,7 @@ import (
 	"go.mondoo.com/cnquery/v10/logger"
 	"go.mondoo.com/cnquery/v10/providers"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/inventory"
+	"go.mondoo.com/cnquery/v10/providers-sdk/v1/recording"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/upstream"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/upstream/health"
 	"go.mondoo.com/cnquery/v10/providers-sdk/v1/vault"
@@ -595,7 +596,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 			}
 			scannerOpts = append(scannerOpts, scan.WithUpstream(upstreamConfig))
 		}
-		scannerOpts = append(scannerOpts, scan.WithRecording(providers.NullRecording{}))
+		scannerOpts = append(scannerOpts, scan.WithRecording(recording.Null{}))
 
 		ui.Message("scan packer build")
 		scanService := scan.NewLocalScanner(scannerOpts...)
