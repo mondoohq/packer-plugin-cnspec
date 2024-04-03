@@ -22,7 +22,7 @@ endif
 
 ifndef VERSION
 # echo "read VERSION from git"
-VERSION=${LATEST_VERSION_TAG}+$(shell git rev-list --count HEAD)
+VERSION=${LATEST_VERSION_TAG}-$(shell git rev-list --count HEAD)
 endif
 
 ifndef CNSPEC_VERSION
