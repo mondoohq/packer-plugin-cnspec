@@ -26,7 +26,7 @@ VERSION=${LATEST_VERSION_TAG}-$(shell git rev-list --count HEAD)
 endif
 
 ifndef CNSPEC_VERSION
-CNSPEC_VERSION=$(shell go list -json -m go.mondoo.com/cnspec/v10 | jq -r ".Version")
+CNSPEC_VERSION=$(shell go list -json -m go.mondoo.com/cnspec/v11 | jq -r ".Version")
 endif
 
 .PHONY: dev
