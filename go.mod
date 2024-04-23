@@ -14,7 +14,7 @@ require (
 require (
 	github.com/cockroachdb/errors v1.11.1
 	github.com/hashicorp/hcl/v2 v2.19.1
-	github.com/hashicorp/packer-plugin-sdk v0.5.2
+	github.com/hashicorp/packer-plugin-sdk v0.5.3
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
