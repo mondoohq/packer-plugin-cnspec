@@ -28,7 +28,7 @@ keyboard ${vm_guest_os_keyboard}
 ### --noipv6	  disable IPv6 on this device
 ###
 ### network  --bootproto=static --ip=172.16.11.200 --netmask=255.255.255.0 --gateway=172.16.11.200 --nameserver=172.16.11.4 --hostname centos-linux-8
-network --bootproto=dhcp
+network --hostname=${hostname} --bootproto=dhcp
 
 ### Lock the root account.
 rootpw --lock

@@ -13,11 +13,11 @@ packer {
   required_version = ">= 1.8.4"
   required_plugins {
     git = {
-      version = ">= 0.3.2"
+      version = ">= 0.6.2"
       source  = "github.com/ethanmdavidson/git"
     }
     vsphere = {
-      version = ">= v1.1.1"
+      version = ">= 1.2.7"
       source  = "github.com/hashicorp/vsphere"
     }
     cnspec = {
@@ -36,18 +36,19 @@ data "git-repository" "cwd" {}
 //  Defines the local variables.
 
 locals {
-  build_by          = "Built by: HashiCorp Packer ${packer.version}"
-  build_date        = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
-  build_version     = data.git-repository.cwd.head
-  build_description = "Version: ${local.build_version}\nBuilt on: ${local.build_date}\n${local.build_by}"
-  iso_paths         = ["[${var.common_iso_datastore}] ${var.iso_path}/${var.iso_file}"]
-  iso_checksum      = "${var.iso_checksum_type}:${var.iso_checksum_value}"
-  manifest_date     = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
-  manifest_path     = "${path.cwd}/manifests/"
-  manifest_output   = "${local.manifest_path}${local.manifest_date}.json"
-  ovf_export_path   = "${path.cwd}/artifacts/${local.vm_name}"
+  build_by            = "Built by: HashiCorp Packer ${packer.version}"
+  build_date          = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
+  build_version       = data.git-repository.cwd.head
+  build_description   = "Version: ${local.build_version}\nBuilt on: ${local.build_date}\n${local.build_by}"
+  iso_paths           = ["[${var.common_iso_datastore}] ${var.iso_path}/${var.iso_file}"]
+  iso_checksum        = "${var.iso_checksum_type}:${var.iso_checksum_value}"
+  manifest_date       = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+  manifest_path       = "${path.cwd}/manifests/"
+  manifest_output     = "${local.manifest_path}${local.manifest_date}.json"
+  ovf_export_path     = "${path.cwd}/artifacts/${local.vm_name}"
   data_source_content = {
     "/ks.cfg" = templatefile("${abspath(path.root)}/data/ks.pkrtpl.hcl", {
+      hostname                 = replace("${var.vm_guest_os_family}-${var.vm_guest_os_name}-${var.vm_guest_os_version}", ".", "-")
       build_username           = var.build_username
       build_password           = var.build_password
       build_password_encrypted = var.build_password_encrypted
@@ -115,7 +116,7 @@ source "vsphere-iso" "linux-rocky" {
   http_port_max = var.common_data_source == "http" ? var.common_http_port_max : null
   boot_order    = var.vm_boot_order
   boot_wait     = var.vm_boot_wait
-  boot_command = [
+  boot_command  = [
     "<up>",
     "e",
     "<down><down><end><wait>",
@@ -154,8 +155,8 @@ source "vsphere-iso" "linux-rocky" {
   dynamic "export" {
     for_each = var.common_ovf_export_enabled == true ? [1] : []
     content {
-      name  = local.vm_name
-      force = var.common_ovf_export_overwrite
+      name    = local.vm_name
+      force   = var.common_ovf_export_overwrite
       options = [
         "extraconfig"
       ]
@@ -171,27 +172,28 @@ build {
   sources = ["source.vsphere-iso.linux-rocky"]
 
   provisioner "cnspec" {
-    #on_failure      = "continue"
+    on_failure         = "continue"
     #score_threshold = 85
     mondoo_config_path = "/Users/chris/.config/mondoo/acme-gcp.yml"
     asset_name         = local.vm_name
-    debug = true
+    debug              = true
     sudo {
       active = true
     }
     annotations = {
-      build_date = local.build_date
-      os_family  = var.vm_guest_os_family
-      os_name    = var.vm_guest_os_name
-      os_version = var.vm_guest_os_version
+      build_date   = local.build_date
+      os_family    = var.vm_guest_os_family
+      os_name      = var.vm_guest_os_name
+      os_version   = var.vm_guest_os_version
+      templateName = local.vm_name
     }
   }
 
   dynamic "hcp_packer_registry" {
     for_each = var.common_hcp_packer_registry_enabled ? [1] : []
     content {
-      bucket_name = local.bucket_name
-      description = local.bucket_description
+      bucket_name   = local.bucket_name
+      description   = local.bucket_description
       bucket_labels = {
         "os_family" : var.vm_guest_os_family,
         "os_name" : var.vm_guest_os_name,
