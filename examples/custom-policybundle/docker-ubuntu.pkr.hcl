@@ -8,7 +8,7 @@ packer {
       source  = "github.com/hashicorp/docker"
     }
     cnspec = {
-      version = ">= 10.0.0"
+      version = ">= 11.0.0"
       source  = "github.com/mondoohq/cnspec"
     }
   }
