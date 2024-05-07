@@ -7,8 +7,8 @@ toolchain go1.22.0
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
-	go.mondoo.com/cnquery/v11 v11.1.1
-	go.mondoo.com/cnspec/v11 v11.1.1
+	go.mondoo.com/cnquery/v11 v11.2.0
+	go.mondoo.com/cnspec/v11 v11.2.0
 )
 
 require (
@@ -69,7 +69,7 @@ require (
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
 	github.com/ashanbrown/makezero v1.1.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
-	github.com/aws/aws-sdk-go v1.51.28 // indirect
+	github.com/aws/aws-sdk-go v1.51.30 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.26.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.27.11 // indirect
@@ -327,7 +327,7 @@ require (
 	gitlab.com/bosi/decorder v0.4.2 // indirect
 	go-simpler.org/musttag v0.12.1 // indirect
 	go-simpler.org/sloglint v0.6.0 // indirect
-	go.mondoo.com/mondoo-go v0.0.0-20240410071618-4acf10b559af // indirect
+	go.mondoo.com/mondoo-go v0.0.0-20240428113533-2abeb382fb38 // indirect
 	go.mondoo.com/ranger-rpc v0.6.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.51.0 // indirect
