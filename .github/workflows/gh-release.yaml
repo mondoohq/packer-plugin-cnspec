@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - "VERSION"
+    branches:
+      - "main"
 
 jobs:
   create-gh-release:
