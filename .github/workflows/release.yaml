@@ -27,7 +27,7 @@ jobs:
       - name: Set cnspec version
         run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v11 | jq -r '.Version')" >> $GITHUB_ENV
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
           args: release --rm-dist --timeout 120m
