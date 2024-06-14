@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 ---
+version: 2
 env:
   - CGO_ENABLED=0
 before:
