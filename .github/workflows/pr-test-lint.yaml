@@ -62,7 +62,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --snapshot --skip-publish --rm-dist
+          args: release --snapshot --skip=publish --clean
         env:
           API_VERSION: x5.0
           CNSPEC_VERSION: ${{ env.CNSPEC_VERSION }}
