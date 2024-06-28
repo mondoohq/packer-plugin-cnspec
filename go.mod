@@ -14,7 +14,7 @@ require (
 require (
 	github.com/cockroachdb/errors v1.11.3
 	github.com/hashicorp/hcl/v2 v2.20.1
-	github.com/hashicorp/packer-plugin-sdk v0.5.3
+	github.com/hashicorp/packer-plugin-sdk v0.5.4
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
@@ -198,7 +198,7 @@ require (
 	github.com/hashicorp/consul/api v1.28.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-getter/v2 v2.2.1 // indirect
+	github.com/hashicorp/go-getter/v2 v2.2.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect

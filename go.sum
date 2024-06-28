@@ -677,8 +677,8 @@ github.com/hashicorp/go-cleanhttp v0.5.0/go.mod h1:JpRdi6/HCYpAwUzNwuwqhbovhLtng
 github.com/hashicorp/go-cleanhttp v0.5.1/go.mod h1:JpRdi6/HCYpAwUzNwuwqhbovhLtngrth3wmdIIUrZ80=
 github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=
 github.com/hashicorp/go-cleanhttp v0.5.2/go.mod h1:kO/YDlP8L1346E6Sodw+PrpBSV4/SoxCXGY6BqNFT48=
-github.com/hashicorp/go-getter/v2 v2.2.1 h1:2JXqPZs1Jej67RtdTi0YZaEB2hEFB3fkBA4cPYKQwFQ=
-github.com/hashicorp/go-getter/v2 v2.2.1/go.mod h1:EcJx6oZE8hmGuRR1l38QrfnyiujQbwsEAn11eHv6l2M=
+github.com/hashicorp/go-getter/v2 v2.2.2 h1:Al5bzCNW5DrlZMK6TumGrSue7Xz8beyLcen+4N4erwo=
+github.com/hashicorp/go-getter/v2 v2.2.2/go.mod h1:hp5Yy0GMQvwWVUmwLs3ygivz1JSLI323hdIE9J9m7TY=
 github.com/hashicorp/go-hclog v0.12.0/go.mod h1:whpDNt7SSdeAju8AWKIWsul05p54N/39EeqMAyrmvFQ=
 github.com/hashicorp/go-hclog v1.0.0/go.mod h1:whpDNt7SSdeAju8AWKIWsul05p54N/39EeqMAyrmvFQ=
 github.com/hashicorp/go-hclog v1.6.3 h1:Qr2kF+eVWjTiYmU7Y31tYlP1h0q/X3Nl3tPGdaB11/k=
@@ -732,8 +732,8 @@ github.com/hashicorp/memberlist v0.2.2/go.mod h1:MS2lj3INKhZjWNqd3N0m3J+Jxf3DAOn
 github.com/hashicorp/memberlist v0.3.0/go.mod h1:MS2lj3INKhZjWNqd3N0m3J+Jxf3DAOnAH9VT3Sh9MUE=
 github.com/hashicorp/memberlist v0.5.0 h1:EtYPN8DpAURiapus508I4n9CzHs2W+8NZGbmmR/prTM=
 github.com/hashicorp/memberlist v0.5.0/go.mod h1:yvyXLpo0QaGE59Y7hDTsTzDD25JYBZ4mHgHUZ8lrOI0=
-github.com/hashicorp/packer-plugin-sdk v0.5.3 h1:rWQuRgUUnkf1O3UYymQZz/nJErLh4NFkuarOVEQK+Rs=
-github.com/hashicorp/packer-plugin-sdk v0.5.3/go.mod h1:ntdZSJnc1LGGdMEXsYOxopZL1311QOTIbzVZH2EbN0U=
+github.com/hashicorp/packer-plugin-sdk v0.5.4 h1:5Bl5DMEa//G4gBNcl842JopM9L4KSSsxpvB4W1lEwIA=
+github.com/hashicorp/packer-plugin-sdk v0.5.4/go.mod h1:ALm0ZIK3c/F4iOqPNi7xVuHTgrR5dxzOK+DhFN5DHj4=
 github.com/hashicorp/serf v0.9.5/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKENpqIUyk=
 github.com/hashicorp/serf v0.9.6/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
 github.com/hashicorp/serf v0.10.1 h1:Z1H2J60yRKvfDYAOZLd2MU0ND4AH/WDz7xYHDWQsIPY=
