@@ -1,0 +1,62 @@
+name: Create GitHub Release
+
+## Only trigger release when the VERSION file changed on main branch
+on:
+  push:
+    paths:
+      - "VERSION"
+    branches:
+      - main
+
+jobs:
+  create-gh-release:
+    name: GH Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set release version
+        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          generate_release_notes: true
+          make_latest: true
+          token: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
+
+  check-release:
+    name: Check whether the release actually started
+    runs-on: ubuntu-latest
+    needs: create-gh-release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set release version
+        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+      - name: Release file present?
+        id: check_release_file
+        uses: nick-fields/retry@v3
+        with:
+          retry_wait_seconds: 10
+          timeout_seconds: 5
+          max_attempts: 60
+          retry_on: error
+          # error on HTTP code different to 302
+          command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
+      - uses: sarisia/actions-status-discord@v1
+        if : ${{ always() && steps.check_release_file.outputs.status == 'failure' }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ steps.check_release_file.outputs.status }}
+          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          description: Workflow ${{ github.workflow }} for ${{ env.RELEASE_VERSION }} failed
+          color: 0xff4d4d
+      - uses: sarisia/actions-status-discord@v1
+        if : ${{ always() && steps.check_release_file.outputs.status == 'success' }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ steps.check_release_file.outputs.status }}
+          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          description: Workflow ${{ github.workflow }} for ${{ env.RELEASE_VERSION }} succeeded
+          color: 0x5dea20
