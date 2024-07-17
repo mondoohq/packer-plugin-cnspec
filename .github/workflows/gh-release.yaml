@@ -2,11 +2,12 @@ name: Create GitHub Release
 
 ## Only trigger release when the VERSION file changed on main branch
 on:
-  push:
-    paths:
-      - "VERSION"
-    branches:
-      - main
+  # push:
+  #   paths:
+  #     - "VERSION"
+  #   branches:
+  #     - main
+  workflow_dispatch:
 
 jobs:
   create-gh-release:
@@ -22,8 +23,8 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
           generate_release_notes: true
-          make_latest: true
-          token: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
+          # make_latest: true
+          # token: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
 
   check-release:
     name: Check whether the release actually started
