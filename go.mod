@@ -7,8 +7,8 @@ toolchain go1.22.4
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
-	go.mondoo.com/cnquery/v11 v11.14.0
-	go.mondoo.com/cnspec/v11 v11.14.0
+	go.mondoo.com/cnquery/v11 v11.14.1-0.20240724175750-e6e001675bad
+	go.mondoo.com/cnspec/v11 v11.14.1
 )
 
 require (
