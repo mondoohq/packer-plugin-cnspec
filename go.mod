@@ -1,14 +1,12 @@
 module go.mondoo.com/packer-plugin-cnspec
 
-go 1.22.0
-
-toolchain go1.22.4
+go 1.23.0
 
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
 	go.mondoo.com/cnquery/v11 v11.19.1
-	go.mondoo.com/cnspec/v11 v11.19.1
+	go.mondoo.com/cnspec/v11 v11.20.0
 )
 
 require (
