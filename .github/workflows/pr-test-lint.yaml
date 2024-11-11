@@ -66,3 +66,35 @@ jobs:
         env:
           API_VERSION: x5.0
           CNSPEC_VERSION: ${{ env.CNSPEC_VERSION }}
+
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
+  go-auto-approve:
+    runs-on: ubuntu-latest
+    needs: [goreleaser, license-check]
+    # For now, we only auto approve and merge cnspec bump PRs created by mondoo-tools.
+    # We have to check the commit author, because the PR is created by "github-actions[bot]"
+    # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#startswith
+    if: ${{ startsWith(github.ref, 'refs/heads/version/cnspec_update_v') && github.event.commits[0].author.name == 'mondoo-tools' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # figure out the PR for this commit
+      - uses: cloudposse-github-actions/get-pr@v1.0.1
+        id: pr
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          filterOutClosed: true
+          filterOutDraft: true
+      - name: Approve a PR
+        uses: fastify/github-action-merge-dependabot@v3
+        with:
+          pr-number: ${{ steps.pr.outputs.number }}
