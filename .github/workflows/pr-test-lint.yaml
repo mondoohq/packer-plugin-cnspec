@@ -67,15 +67,6 @@ jobs:
           API_VERSION: x5.0
           CNSPEC_VERSION: ${{ env.CNSPEC_VERSION }}
 
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"
-
   go-auto-approve:
     runs-on: ubuntu-latest
     needs: [goreleaser, license-check]
