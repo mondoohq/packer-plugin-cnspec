@@ -10,5 +10,7 @@ Sorce
 ^untill$
 ^untilling$
 ^wether.*
+\w*(?<!right-)click
 deets
 organisation
+
