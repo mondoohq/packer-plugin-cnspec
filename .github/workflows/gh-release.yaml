@@ -1,4 +1,4 @@
-name: Create GitHub Release
+name: Create packer-plugin-cnspec GitHub Release
 
 ## Only trigger release when the VERSION file changed on main branch
 on:
@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  # C07QZDJFF89 == #release-coordination
+  SLACK_BOT_CHANNEL_ID: "C07QZDJFF89"
+
 jobs:
   create-gh-release:
     name: GH Release
@@ -16,6 +20,23 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - id: slack
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
+            text: "GitHub Actions Run"
+            attachments:
+              - color: "#FFFF00"
+                blocks:
+                  - type: "section"
+                    fields:
+                      - type: "mrkdwn"
+                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
+                      - type: "mrkdwn"
+                        text: "*Status:*\n`In Progress`"
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set release version
@@ -27,16 +48,6 @@ jobs:
           generate_release_notes: true
           make_latest: true
           token: ${{ secrets.GH_BUILDER_TOKEN }}
-
-  check-release:
-    name: Check whether the release actually started
-    runs-on: ubuntu-latest
-    needs: create-gh-release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set release version
-        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
       - name: Release file present?
         id: check_release_file
         uses: nick-fields/retry@v3
@@ -47,19 +58,23 @@ jobs:
           retry_on: error
           # error on HTTP code different to 302
           command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
-      - uses: sarisia/actions-status-discord@v1
-        if : ${{ always() && steps.check_release_file.outputs.status == 'failure' }}
+      - uses: slackapi/slack-github-action@v2.0.0
+        if : ${{ always() }}
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: ${{ steps.check_release_file.outputs.status }}
-          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          description: Workflow ${{ github.workflow }} for ${{ env.RELEASE_VERSION }} failed
-          color: 0xff4d4d
-      - uses: sarisia/actions-status-discord@v1
-        if : ${{ always() && steps.check_release_file.outputs.status == 'success' }}
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: ${{ steps.check_release_file.outputs.status }}
-          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          description: Workflow ${{ github.workflow }} for ${{ env.RELEASE_VERSION }} succeeded
-          color: 0x5dea20
+          method: chat.update
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
+            ts: "${{ steps.slack.outputs.ts }}"
+            text: "GitHub Actions Run"
+            attachments:
+              - color: "${{ (steps.check_release_file.outputs.status == 'success') && '#00FF00' || (steps.check_release_file.outputs.status == 'failure') && '#FF0000' || '#FFA500' }}"
+                blocks:
+                  - type: "section"
+                    fields:
+                      - type: "mrkdwn"
+                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
+                      - type: "mrkdwn"
+                        text: " "
+                      - type: "mrkdwn"
+                        text: "*Status:*\n`${{ steps.check_release_file.outputs.status }}`"
