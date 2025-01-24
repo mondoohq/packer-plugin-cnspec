@@ -32,7 +32,7 @@ endif
 .PHONY: dev
 
 build:
-	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/cnquery/v10.Version=${CNSPEC_VERSION} -X go.mondoo.com/packer-plugin-cnspec/version.Version=${VERSION} -X go.mondoo.com/packer-plugin-cnspec/version.Build=${TAG}"
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/cnquery/v10.Version=${CNSPEC_VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Version=${VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Build=${TAG}"
 
 dev: build
 	@mkdir -p ~/.packer.d/plugins/

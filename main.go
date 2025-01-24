@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/packer-plugin-sdk/plugin"
 	"go.mondoo.com/packer-plugin-cnspec/provisioner"
-	"go.mondoo.com/packer-plugin-cnspec/version"
+	"go.mondoo.com/packer-plugin-cnspec/provisioner/version"
 )
 
 func main() {
