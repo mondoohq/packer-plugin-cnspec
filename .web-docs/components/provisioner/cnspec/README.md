@@ -3,6 +3,7 @@ Type: `cnspec`
 Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows machine images for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
 
 ## Basic Example
+
 ```hcl
 provisioner "cnspec" {
   on_failure          = "continue"
@@ -10,6 +11,16 @@ provisioner "cnspec" {
   sudo {
     active = true
   }
+}
+```
+
+The following configuration shows how to set the output format to JUnit and the output target to `test-results.xml`:
+
+```hcl
+provisioner "cnspec" {
+  on_failure = "continue"
+  output = "junit"
+  output_target = "test-results.xml"
 }
 ```
 

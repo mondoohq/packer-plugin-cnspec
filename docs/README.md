@@ -31,10 +31,8 @@ $ packer plugins install github.com/mondoohq/cnspec
 #### Provisioners
 
 - [cnspec](/packer/integrations/mondoohq/cnspec/latest/components/provisioner/cnspec) - Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans 
-Linux and Windows machine images for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
-- [mondoo](/packer/integrations/mondoohq/cnspec/latest/components/provisioner/mondoo) - The `mondoo` provisioner scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security
-policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of
-certified security policies which can be easily customize to meet your needs.
+Linux and Windows machine images for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo, which is updated daily with the latest CVEs and advisories. Additionally, cnspec runs policy-as-code security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. 
+- [mondoo](/packer/integrations/mondoohq/cnspec/latest/components/provisioner/mondoo) - Deprecated. Use the `cnspec` provisioner instead.
 
 ### Tutorials
 
