@@ -79,40 +79,7 @@ packer build amazon-linux-2.pkr.hcl
 
 ## Configure Packer Plugin cnspec
 
-| **Name**             | **Description**                                                                                                                                                                                                                                                                                            | **Type**         | **Default** | **Required** |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------- | ------------ |
-| `annotations`        | Apply custom annotations to Packer build assets to provide additional metadata for asset tracking.                                                                                                                                                                                                         | `map of strings` | None        | No           |
-| `asset_name`         | Overwrite the asset name in Mondoo Platform.                                                                                                                                                                                                                                                               | `string`         | None        | No           |
-| `on_failure`         | Set `on_failure = "continue"` to ignore build failures that do not meet any set `score_threshold`.                                                                                                                                                                                                         | `string`         | None        | No           |
-| `score_threshold`    | Set a score threshold for Packer builds `[0-100]`. Any scans that fall below the `score_threshold` will fail unless `on_failure = "continue"`. To learn more, read [How Mondoo scores policies](https://mondoo.com/docs/platform/console/monitor/#how-mondoo-scores-policies) in the Mondoo documentation. | `int`            | None        | No           |
-| `sudo`               | Use sudo to elevate permissions when running Mondoo scans.                                                                                                                                                                                                                                                 | `bool`           | None        | No           |
-| `mondoo_config_path` | The path to the Mondoo's service account. Defaults to `$HOME/.config/mondoo/mondoo.yml`                                                                                                                                                                                                                    | `string`         | None        | No           |
-| `output`             | Set output format: compact, csv, full, json, junit, report, summary, yaml (default "compact")                                                                                                                                                                                                              | `string`         | None        | No           |
-| `output_target`      | Set output target. E.g. path to local file `result.xml`                                                                                                                                                                                                                                                    | `string`         | None        | No           |
-
-### Example: Complete Configuration
-
-A simple configuration where we set a score threshold of 85 and use sudo to elevate permissions when running the scans:
-
-```hcl
-provisioner "cnspec" {
-  on_failure      = "continue"
-  score_threshold = 85
-  sudo {
-    active = true
-  }
-}
-```
-
-The following configuration shows how to set the output format to JUnit and the output target to `test-results.xml`:
-
-```hcl
-provisioner "cnspec" {
-  on_failure = "continue"
-  output = "junit"
-  output_target = "test-results.xml"
-}
-```
+For detailed instructions on configuring the Packer Plugin cnspec, please visit the official HashiCorp documentation at Packer Plugin cnspec. There you'll find comprehensive guidance on setup and configuration options.
 
 ## Sample Packer Templates
 
