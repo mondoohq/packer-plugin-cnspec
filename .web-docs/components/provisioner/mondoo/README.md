@@ -1,6 +1,7 @@
 Type: `mondoo`
 
->This plugin has been deprecated. Migrate to [Packer plugin cnspec by Mondoo](https://developer.hashicorp.com/packer/plugins/provisioner/mondoo/cnspec) for even easier security scanning of your Packer builds.
+> [!WARNING]
+> This plugin has been deprecated. Migrate to [Packer plugin cnspec by Mondoo](https://developer.hashicorp.com/packer/plugins/provisioner/mondoo/cnspec) for even easier security scanning of your Packer builds.
 
 The `mondoo` provisioner scans [Packer](https://www.packer.io) builds for vulnerabilities and misconfigurations by executing security
 policies-as-code enabled in [Mondoo Platform](https://console.mondoo.com). Mondoo Platform comes stocked with an ever-increasing collection of
