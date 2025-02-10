@@ -16,10 +16,8 @@ jobs:
         with:
           go-version: ">=${{ env.golang-version }}"
           cache: false
-      - shell: bash
-        run: make generate
-      - shell: bash
-        run: |
+      - run: |
+          make generate
           if [[ -z "$(git status -s)" ]]; then
             echo "OK"
           else
