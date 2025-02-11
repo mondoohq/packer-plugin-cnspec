@@ -50,8 +50,10 @@ Optional Parameters:
 - `ssh_authorized_key_file` (string) - The SSH public key of the packer `ssh_user`.
   The default behavior is to generate and use a onetime key.
 
-- `use_sftp` (bool) - packer's SFTP proxy is not reliable on some unix/linux systems,
-  therefore we recommend to use scp as default for packer proxy
+- `use_sftp` (bool) - Deprecated: SFTP is now the default. To use SCP instead, set use_scp to true
+
+- `use_scp` (bool) - Use SCP instead of SFTP. By default, SFTP is used since
+  SCP communication can fail on Windows 2025 and SSH systems.
 
 - `debug` (bool) - Sets the log level to `DEBUG`
 

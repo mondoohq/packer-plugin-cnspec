@@ -24,6 +24,7 @@ type FlatConfig struct {
 	SSHHostKeyFile       *string           `mapstructure:"ssh_host_key_file" cty:"ssh_host_key_file" hcl:"ssh_host_key_file"`
 	SSHAuthorizedKeyFile *string           `mapstructure:"ssh_authorized_key_file" cty:"ssh_authorized_key_file" hcl:"ssh_authorized_key_file"`
 	UseSFTP              *bool             `mapstructure:"use_sftp" cty:"use_sftp" hcl:"use_sftp"`
+	UseSCP               *bool             `mapstructure:"use_scp" cty:"use_scp" hcl:"use_scp"`
 	Debug                *bool             `mapstructure:"debug" cty:"debug" hcl:"debug"`
 	AssetName            *string           `mapstructure:"asset_name" cty:"asset_name" hcl:"asset_name"`
 	OnFailure            *string           `mapstructure:"on_failure" cty:"on_failure" hcl:"on_failure"`
@@ -68,6 +69,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"ssh_host_key_file":          &hcldec.AttrSpec{Name: "ssh_host_key_file", Type: cty.String, Required: false},
 		"ssh_authorized_key_file":    &hcldec.AttrSpec{Name: "ssh_authorized_key_file", Type: cty.String, Required: false},
 		"use_sftp":                   &hcldec.AttrSpec{Name: "use_sftp", Type: cty.Bool, Required: false},
+		"use_scp":                    &hcldec.AttrSpec{Name: "use_scp", Type: cty.Bool, Required: false},
 		"debug":                      &hcldec.AttrSpec{Name: "debug", Type: cty.Bool, Required: false},
 		"asset_name":                 &hcldec.AttrSpec{Name: "asset_name", Type: cty.String, Required: false},
 		"on_failure":                 &hcldec.AttrSpec{Name: "on_failure", Type: cty.String, Required: false},
