@@ -67,9 +67,11 @@ type Config struct {
 	// The SSH public key of the packer `ssh_user`.
 	// The default behavior is to generate and use a onetime key.
 	SSHAuthorizedKeyFile string `mapstructure:"ssh_authorized_key_file"`
-	// packer's SFTP proxy is not reliable on some unix/linux systems,
-	// therefore we recommend to use scp as default for packer proxy
+	// Deprecated: SFTP is now the default. To use SCP instead, set use_scp to true
 	UseSFTP bool `mapstructure:"use_sftp"`
+	// Use SCP instead of SFTP. By default, SFTP is used since
+	// SCP communication can fail on Windows 2025 and SSH systems.
+	UseSCP bool `mapstructure:"use_scp"`
 	// Sets the log level to `DEBUG`
 	Debug bool `mapstructure:"debug"`
 	// The asset name passed to Mondoo Platform. Defaults to the hostname
@@ -353,7 +355,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		assetConfig.Insecure = true // we do not check the hostkey for the packer build
 		assetConfig.Credentials = []*vault.Credential{}
 
-		if !p.config.UseSFTP {
+		if p.config.UseSCP || !p.config.UseSFTP {
 			assetConfig.Options["ssh_scp"] = "on"
 		}
 
