@@ -65,4 +65,3 @@ mkdir -p ~/.packer.d/plugins
 mv "packer-plugin-cnspec_${version}_x5.0_${os}_${arch}" ~/.packer.d/plugins/packer-plugin-cnspec
 echo "Marking executable..."
 chmod +x ~/.packer.d/plugins/packer-plugin-cnspec
-
