@@ -894,9 +894,9 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
-github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
-github.com/rs/zerolog v1.33.0 h1:1cU2KZkvPxNyfgEmhHAz/1A9Bz+llsdYzklWFzgp0r8=
-github.com/rs/zerolog v1.33.0/go.mod h1:/7mN4D5sKwJLZQ2b/znpjC3/GQWY/xaDXUM0kKWRHss=
+github.com/rs/xid v1.6.0/go.mod h1:7XoLgs4eV+QndskICGsho+ADou8ySMSjJKDIan90Nz0=
+github.com/rs/zerolog v1.34.0 h1:k43nTLIwcTVQAncfCw4KZ2VY6ukYoZaBPNOE8txlOeY=
+github.com/rs/zerolog v1.34.0/go.mod h1:bJsvje4Z08ROH4Nhs5iH600c3IkWhwp44iRc54W6wYQ=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/ryanuber/go-glob v1.0.0 h1:iQh3xXAumdQ+4Ufa5b25cRpC5TYKlno6hsv6Cb3pkBk=
@@ -1018,10 +1018,10 @@ github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmB
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=
-go.mondoo.com/cnquery/v11 v11.46.2 h1:8qP5SPEudT/a7STsW+RGGARdDT0iR3EFfTe1H+7wd+Q=
-go.mondoo.com/cnquery/v11 v11.46.2/go.mod h1:r8EbP65J5s4gSOZGUUZ576cx6JUKHLqRIYOHtaw9wfY=
-go.mondoo.com/cnspec/v11 v11.46.2 h1:71fG+0GbbrnO/MvngxSsXCwsqQP6mAiHsIiyB8/WtAs=
-go.mondoo.com/cnspec/v11 v11.46.2/go.mod h1:39tlEh6wOl23sh0TQclUef30TI4Vu7npUNfHxIxziLM=
+go.mondoo.com/cnquery/v11 v11.47.0 h1:ja+1RSaCLlEvS6SLyFrcvmU97OZTJD/bLRVcuOJIzo4=
+go.mondoo.com/cnquery/v11 v11.47.0/go.mod h1:r8EbP65J5s4gSOZGUUZ576cx6JUKHLqRIYOHtaw9wfY=
+go.mondoo.com/cnspec/v11 v11.47.0 h1:ZbjmyaKs/PsXIK/oMtRJCKNL730cdOfDuEmpNyFFz9w=
+go.mondoo.com/cnspec/v11 v11.47.0/go.mod h1:0oQYxZsPU/x6iUMTer1vFtEjCj7iwwabNjP9S4a+saE=
 go.mondoo.com/mondoo-go v0.0.0-20250212000342-6747bee9aaa7 h1:P0YiMeThcvBmrI8jJqIfMct7uGvAZL/Lrry/SU40L50=
 go.mondoo.com/mondoo-go v0.0.0-20250212000342-6747bee9aaa7/go.mod h1:0HMHhLaS0V1himFIJQxABmvqEAdWv1NUScXpSjrhxqo=
 go.mondoo.com/ranger-rpc v0.6.5 h1:KKoeTGPonJI3T6lrT9oxdH9eNlZC6pdqYvsuWZWyB6w=
