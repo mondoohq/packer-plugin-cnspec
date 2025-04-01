@@ -2,6 +2,8 @@ module go.mondoo.com/packer-plugin-cnspec
 
 go 1.23.0
 
+toolchain go1.24.1
+
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
@@ -12,7 +14,7 @@ require (
 require (
 	github.com/cockroachdb/errors v1.11.3
 	github.com/hashicorp/hcl/v2 v2.23.0
-	github.com/hashicorp/packer-plugin-sdk v0.6.0
+	github.com/hashicorp/packer-plugin-sdk v0.6.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
