@@ -59,10 +59,11 @@ jobs:
         id: check_release_file
         uses: nick-fields/retry@v3
         with:
-          retry_wait_seconds: 10
+          retry_wait_seconds: 30
           timeout_seconds: 5
-          max_attempts: 60
+          max_attempts: 120
           retry_on: error
+          warning_on_retry: false
           # error on HTTP code different to 302
           command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
       - uses: slackapi/slack-github-action@v2.0.0
