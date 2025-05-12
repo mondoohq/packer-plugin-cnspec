@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: slack
-        uses: slackapi/slack-github-action@v2.0.0
+        uses: slackapi/slack-github-action@v2.1.0
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -66,7 +66,7 @@ jobs:
           warning_on_retry: false
           # error on HTTP code different to 302
           command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
-      - uses: slackapi/slack-github-action@v2.0.0
+      - uses: slackapi/slack-github-action@v2.1.0
         if : ${{ always() }}
         with:
           method: chat.update
