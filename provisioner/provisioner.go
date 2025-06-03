@@ -231,7 +231,7 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 
 		// Remove the private key file when we're done with scanning
 		if len(k.privKeyFile) > 0 {
-			defer os.Remove(k.privKeyFile)
+			defer os.Remove(k.privKeyFile) //nolint:errcheck
 		}
 
 		keyChecker := ssh.CertChecker{
@@ -347,7 +347,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
-	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" {
+	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" { //nolint:staticcheck
 		ui.Message("detected packer build via ssh")
 		assetConfig.Type = "ssh"
 		assetConfig.Host = p.buildInfo.Host
