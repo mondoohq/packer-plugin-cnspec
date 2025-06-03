@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 # See https://golangci-lint.run/usage/configuration/ for configuration options
+version: "2"
 run:
-  timeout: 5m
   modules-download-mode: readonly
-
-issues:
-  exclude-files:
-    - ".*\\.pb\\.go$"
-    - ".*\\.lr\\.go$"
+linters:
+  exclusions:
+    paths:
+      - .*\.pb\.go$
+      - .*\.lr\.go$
