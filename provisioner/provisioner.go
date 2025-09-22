@@ -212,12 +212,12 @@ func (p *Provisioner) Provision(ctx context.Context, ui packer.Ui, comm packer.C
 		if err != nil {
 			return err
 		}
-		ui.Message("build info: " + string(data))
+		ui.Say("build info: " + string(data))
 	}
 
 	// configure ssh proxy
 	if p.config.UseProxy {
-		ui.Message("configure ssh proxy")
+		ui.Say("configure ssh proxy")
 		k, err := newUserKey(p.config.SSHAuthorizedKeyFile)
 		if err != nil {
 			return err
@@ -340,7 +340,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	if p.config.Sudo != nil && p.config.Sudo.Active {
-		ui.Message("activated sudo")
+		ui.Say("activated sudo")
 		assetConfig.Sudo = &inventory.Sudo{
 			Active:     p.config.Sudo.Active,
 			Executable: "sudo",
@@ -348,7 +348,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	if p.buildInfo.ConnType == "" || p.buildInfo.ConnType == "ssh" { //nolint:staticcheck
-		ui.Message("detected packer build via ssh")
+		ui.Say("detected packer build via ssh")
 		assetConfig.Type = "ssh"
 		assetConfig.Host = p.buildInfo.Host
 		assetConfig.Port = int32(p.buildInfo.Port)
@@ -361,7 +361,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 
 		// use proxy
 		if p.config.UseProxy {
-			ui.Message("use packer's ssh proxy")
+			ui.Say("use packer's ssh proxy")
 			// overwrite host since we go via the proxy now
 			assetConfig.Host = "127.0.0.1"
 			assetConfig.Port = int32(p.config.LocalPort)
@@ -387,7 +387,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 			assetConfig.Credentials = append(assetConfig.Credentials, cred)
 		}
 	} else if p.buildInfo.ConnType == "winrm" {
-		ui.Message("detected packer build via winrm")
+		ui.Say("detected packer build via winrm")
 		assetConfig.Type = "winrm"
 		assetConfig.Host = p.buildInfo.Host
 		assetConfig.Port = int32(p.buildInfo.Port)
@@ -395,12 +395,12 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		cred := vault.NewPasswordCredential(p.buildInfo.User, p.buildInfo.Password)
 		assetConfig.Credentials = append(assetConfig.Credentials, cred)
 	} else if p.buildInfo.ConnType == "docker" {
-		ui.Message("detected packer container image build")
+		ui.Say("detected packer container image build")
 		assetConfig.Type = "docker-container"
 		// buildInfo.ID containers the docker container image id
 		assetConfig.Host = fmt.Sprintf("%s", p.buildInfo.ID)
 	} else {
-		ui.Message("detected packer build via unknown connection type: " + p.buildInfo.ConnType)
+		ui.Say("detected packer build via unknown connection type: " + p.buildInfo.ConnType)
 		return errors.New("unsupported connection type: " + p.buildInfo.ConnType)
 	}
 
@@ -408,7 +408,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	var policyFilters []string
 
 	if p.config.PolicyBundle != "" {
-		ui.Message("load policy bundle from: " + p.config.PolicyBundle)
+		ui.Say("load policy bundle from: " + p.config.PolicyBundle)
 		var err error
 		bundleLoader := policy.DefaultBundleLoader()
 		policyBundle, err = bundleLoader.BundleFromPaths(p.config.PolicyBundle)
@@ -454,14 +454,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 			ui.Error("failed to dump JSON:" + err.Error())
 		}
 
-		ui.Message(fmt.Sprintf("cnspec job configuration: %v", string(raw)))
+		ui.Say(fmt.Sprintf("cnspec job configuration: %v", string(raw)))
 
 		// configure stderr logger
 		logger.Set("debug")
 
 		// log output for debug/error logs
 		defer func() {
-			ui.Message(debugLogBuffer.String())
+			ui.Say(debugLogBuffer.String())
 		}()
 
 		DumpLocal := "./mondoo-debug-"
@@ -476,7 +476,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	// base 64 config env setting has always precedence
 	viper.SetConfigType("yaml")
 	if value := os.Getenv("MONDOO_CONFIG_BASE64"); len(value) > 0 {
-		ui.Message("load config from detected MONDOO_CONFIG_BASE64")
+		ui.Say("load config from detected MONDOO_CONFIG_BASE64")
 		decodedData, err := base64.StdEncoding.DecodeString(value)
 		if err != nil {
 			wErr := errors.Wrap(err, "cannot parse config from MONDOO_CONFIG_BASE64")
@@ -523,7 +523,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 				continue
 			}
 
-			ui.Message("load config from detected " + path)
+			ui.Say("load config from detected " + path)
 			data, err := os.ReadFile(path)
 			if err != nil {
 				wErr := errors.Wrap(err, "cannot parse config from "+path)
@@ -542,7 +542,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 
 		if !foundConfig {
-			ui.Message("no configuration provided")
+			ui.Say("no configuration provided")
 			p.config.Incognito = true
 		}
 	}
@@ -564,15 +564,15 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if err != nil {
 		ui.Error("failed to update provider, fallback to existing one: " + err.Error())
 	} else {
-		ui.Message("successfully updated OS provider")
+		ui.Say("successfully updated OS provider")
 		provider = updated
 	}
 
-	ui.Message("use OS provider version " + provider.Version + " (" + provider.Path + ")")
+	ui.Say("use OS provider version " + provider.Version + " (" + provider.Path + ")")
 
 	var res *scan.ScanResult
 	if p.config.Incognito {
-		ui.Message("scan packer build in incognito mode")
+		ui.Say("scan packer build in incognito mode")
 		scanService := scan.NewLocalScanner()
 		res, err = scanService.RunIncognito(context.Background(), scanJob)
 		if err != nil {
@@ -590,7 +590,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		var scannerOpts []scan.ScannerOption
 		serviceAccount := cfg.GetServiceCredential()
 		if serviceAccount != nil {
-			ui.Message("using service account credentials")
+			ui.Say("using service account credentials")
 			upstreamConfig := &upstream.UpstreamConfig{
 				SpaceMrn:    cfg.GetParentMrn(),
 				ApiEndpoint: cfg.UpstreamApiEndpoint(),
@@ -600,7 +600,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 		scannerOpts = append(scannerOpts, scan.WithRecording(recording.Null{}))
 
-		ui.Message("scan packer build")
+		ui.Say("scan packer build")
 		scanService := scan.NewLocalScanner(scannerOpts...)
 		res, err = scanService.Run(context.Background(), scanJob)
 		if err != nil {
@@ -637,7 +637,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	if buf.Len() > 0 {
-		ui.Message(buf.String())
+		ui.Say(buf.String())
 	}
 
 	// default is to pass all controls
@@ -658,7 +658,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		return errors.New("scan failed with errors, use `debug: true` logging for more details")
 	}
 
-	ui.Message("scan completed successfully")
+	ui.Say("scan completed successfully")
 
 	return nil
 }
