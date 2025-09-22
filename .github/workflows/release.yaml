@@ -25,7 +25,7 @@ jobs:
           go-version: ">=${{ env.golang-version }}"
           cache: false
       - name: Set cnspec version
-        run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v11 | jq -r '.Version')" >> $GITHUB_ENV
+        run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v12 | jq -r '.Version')" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
