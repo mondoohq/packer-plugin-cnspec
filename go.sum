@@ -1047,10 +1047,10 @@ github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmB
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=
-go.mondoo.com/cnquery/v11 v11.69.1 h1:nle9AbUhQl+XOpGtKReuJudJcJ+isq/io/+6QmmHX+Q=
-go.mondoo.com/cnquery/v11 v11.69.1/go.mod h1:6rfarvzViSZsU+8N358cw2EF83tVPK7aUdF7Jj2DM1A=
-go.mondoo.com/cnspec/v11 v11.69.1 h1:Sj3GBKOiAGWgHKM8iYOeKlanATS2jbA/Wf65k3PO3Co=
-go.mondoo.com/cnspec/v11 v11.69.1/go.mod h1:LVjWvtzS/qkrfHJyyU3qkJtYqIXrpfjKmFqxITS341c=
+go.mondoo.com/cnquery/v12 v12.1.0 h1:cSeN0y5AlDg2NJX11h7Q6niZV7LfpVhnz6IPxiFccEI=
+go.mondoo.com/cnquery/v12 v12.1.0/go.mod h1:oGV6Fwj9+NIIMMZIANVWm3wnKYArPCANwFNj5YU1FaY=
+go.mondoo.com/cnspec/v12 v12.1.0 h1:cMaS8K00jA2jQZ5GVkXcFUzOrrLh0J4Ez1p6CoWvep4=
+go.mondoo.com/cnspec/v12 v12.1.0/go.mod h1:npLiwi9p7xS5qdzdCBCMTIHYiBAtoZfUhU1iN1IG2jY=
 go.mondoo.com/mondoo-go v0.0.0-20250903000415-5d2e0cc74372 h1:lpOgdbfNd8g9k5CJBwPtLPW3xFlsp25c90toLUdxqk8=
 go.mondoo.com/mondoo-go v0.0.0-20250903000415-5d2e0cc74372/go.mod h1:Ih8FsSC1VhLk7F3hS7Ji6nleAi29VMqRb7f555jr6SE=
 go.mondoo.com/ranger-rpc v0.7.0 h1:QZDgQ8y5e9sCS5BYjwaow1HWBfQ3UwIdfUEQ2SJRO58=
