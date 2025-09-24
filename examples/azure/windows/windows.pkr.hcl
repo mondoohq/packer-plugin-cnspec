@@ -8,7 +8,7 @@ packer {
       version = ">= 2"
     }
     cnspec = {
-      version = ">= 11.0.0"
+      version = "~> 12"
       source  = "github.com/mondoohq/cnspec"
     }
   }

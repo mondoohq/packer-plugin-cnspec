@@ -13,7 +13,7 @@ packer {
       source  = "github.com/hashicorp/vsphere"
     }
     cnspec = {
-      version = ">= 11.0.0"
+      version = "~> 12"
       source  = "github.com/mondoohq/cnspec"
     }
   }

@@ -4,11 +4,11 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 1.1.0"
+      version = "~> 1"
       source  = "github.com/hashicorp/amazon"
     }
     cnspec = {
-      version = ">= 11.0.0"
+      version = "~> 12"
       source  = "github.com/mondoohq/cnspec"
     }
   }
