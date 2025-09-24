@@ -2,23 +2,67 @@
 
 ![packer-plugin-cnspec illustration](.github/social/preview.jpg)
 
-Packer Plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo that is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec-policies) to uncover common misconfigurations that open your hosts to the risk of attack. cnspec supports scanning Linux, Windows, and macOS, as well as Docker containers.
+Packer Plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://mondoo.com) scans Linux and Windows [HashiCorp Packer](https://www.packer.io) builds for vulnerabilities and security misconfigurations. The plugin retrieves CVE data from Mondoo that is updated daily with the latest CVEs and advisories. Additionally, cnspec runs security scans using [cnspec-policies](https://github.com/mondoohq/cnspec/blob/main/content/) to uncover common misconfigurations that open your hosts to the risk of attack. cnspec supports scanning Linux, Windows, and macOS, as well as Docker containers.
 
 ## Plugin modes
 
 Packer Plugin cnspec is designed to work in one of two modes:
 
-- **Unregistered** - In unregistered mode, the plugin works without being registered with Mondoo Platform, and is designed to provide baseline security scanning with minimal configuration. On Linux builds, the plugin runs the [Linux Security by Mondoo](https://github.com/mondoohq/cnspec-policies/blob/main/core/mondoo-linux-security.mql.yaml) policy. On Windows builds, the plugin runs the [Windows Security by Mondoo](https://github.com/mondoohq/cnspec-policies/blob/main/core/mondoo-windows-security.mql.yaml) policy. Each of these policies provides security hardening checks based on industry standards for Linux and Windows. Scan results display in STDOUT during the Packer run.
+- **Unregistered** - In unregistered mode, the plugin works without being registered with Mondoo Platform, and is designed to provide baseline security scanning with minimal configuration. On Linux builds, the plugin runs the [Linux Security by Mondoo](https://github.com/mondoohq/cnspec/blob/main/content/mondoo-linux-security.mql.yaml) policy. On Windows builds, the plugin runs the [Windows Security by Mondoo](https://github.com/mondoohq/cnspec/blob/main/content/mondoo-windows-security.mql.yaml) policy. Each of these policies provides security hardening checks based on industry standards for Linux and Windows. Scan results display in STDOUT during the Packer run.
 
 - **Registered** - In registered mode, the plugin is registered with your account in Mondoo Platform using a service account. This allows you to configure and customize any of the policies in Mondoo Platform, including CIS benchmarks and more. Scan results are shown in STDOUT and sent back to Mondoo Platform for your records.
+
+## Configuration Options
+
+The `packer-plugin-cnspec` plugin supports a wide range of configuration options to customize scanning behavior, authentication, output, and policy usage. These options can be set directly in your Packer template or via environment variables where applicable.
+
+### Plugin Configuration Fields
+
+| Field | Type | Description |
+| ----------- | ----------- | ----------- |
+| `annotations` | `map[string]string` | Key/value annotations to assign to scanned assets. |
+| `asset_name` | `string` | Custom asset name to display in Mondoo Platform. Defaults to instance hostname. |
+| `debug` | `bool` | Enables debug logging. |
+| `host_alias` | `string` | Alias by which the host should be identified in Mondoo Platform. Defaults to `default`. |
+| `incognito` | `bool` | Disables sending scan results to Mondoo Platform. Defaults to automatic detection. |
+| `labels` | `map[string]string` | Key/value labels to assign to scanned assets. |
+| `local_port` | `uint` | Starting port to listen for SSH connections. Defaults to system-assigned port if not set. |
+| `mondoo_config_path` | `string` | Path to the Mondoo service account YAML file. Defaults to `$HOME/.config/mondoo/mondoo.yml`. |
+| `on_failure` | `string` | Behavior when `score_threshold` is not met. Options: `continue` or `fail`. Default: `fail`. |
+| `output` | `string` | Output format. Options: `compact`, `csv`, `full`, `json`, `junit`, `report`, `summary`, `yaml`. Default: `compact`. |
+| `output_target` | `string` | Target path for saving output. Optional. |
+| `policies` | `[]string` | List of policy paths or URLs to use instead of defaults. Enables incognito mode. |
+| `policybundle` | `string` | Path to a local `.tar.gz` policy bundle. |
+| `score_threshold` | `int` | Integer threshold for scan score. Builds fail if the score is below this value. Default: `0`. |
+| `ssh_authorized_key_file` | `string` | Path to public key of SSH user. Defaults to autogenerated one-time key. |
+| `ssh_host_key_file` | `string` | Path to SSH key used for forwarding commands. Defaults to autogenerated one-time key. |
+| `sudo` | `*SudoConfig` | Runs scan with `--sudo` when applicable. |
+| `use_proxy` | `bool` | Use proxy to connect to the host. Falls back to Packer’s communicator proxy if needed. |
+| `use_scp` | `bool` | Use SCP instead of SFTP. Not recommended on Windows 2025. Default: false. |
+| `use_sftp` | `bool` | (Deprecated) Use SFTP for file transfers. Default: true. |
+| `user` | `string` | The user for SSH connection. Defaults to the communicator's configured user. |
+| `winrm_password` | `string` | WinRM password for Windows instances. Defaults to communicator’s password. |
+| `winrm_user` | `string` | WinRM user for Windows instances. Defaults to communicator’s user. |
+
+### Environment Variables
+
+Some configuration options can also be set using environment variables, especially those related to authentication:
+
+| Environment Variable | Description |
+| ----------- | ----------- |
+| `MONDOO_CONFIG_PATH` | Path to the Mondoo service account YAML file. Equivalent to `mondoo_config_path`. |
+| `MONDOO_CONFIG_BASE64` | Base64-encoded Mondoo service account config. Used in CI/CD environments or inline secrets. |
+
+For more information about Mondoo service accounts, refer to the official documentation:  
+https://mondoo.com/docs/platform/maintain/access/non-human/service_accounts/
 
 ## Tutorials
 
 Check out the Packer tutorials on the Mondoo documentation site:
 
-- [Build secure AMIs with Mondoo and Packer](https://mondoo.com/docs/cnspec/cnspec-aws/cnspec-aws-packer/)
+- [Build Secure AMIs with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cloud/aws/packer/)
 
-- [Build secure VM images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cnspec-gcp/cnspec-gcp-packer/)
+- [Build Secure VM Images in Google Cloud with cnspec and HashiCorp Packer](https://mondoo.com/docs/cnspec/cloud/gcp/packer/)
 
 # Install Packer plugin cnspec
 
@@ -36,7 +80,7 @@ To install Packer Plugin cnspec:
 packer {
   required_plugins {
     cnspec = {
-      version = ">= 10.0.0"
+      version = "~> 12"
       source  = "github.com/mondoohq/cnspec"
     }
   }

@@ -3,12 +3,12 @@
 
 packer {
   required_plugins {
-    googlecompute = {
-      version = ">= 1.0.0"
-      source  = "github.com/hashicorp/googlecompute"
+    amazon = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/amazon"
     }
     cnspec = {
-      version = ">= 11.0.0"
+      version = "~> 12"
       source  = "github.com/mondoohq/cnspec"
     }
   }
