@@ -24,7 +24,8 @@ jobs:
 
   goreleaser:
     name: GoReleaser
-    runs-on: self-hosted
+    runs-on:
+      group: Default
     env:
       RUNNER_TYPE: "self-hosted"
     timeout-minutes: 120
