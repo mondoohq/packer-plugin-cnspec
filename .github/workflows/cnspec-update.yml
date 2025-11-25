@@ -17,6 +17,29 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Dump context
+        run: echo $JSON
+        env:
+          JSON: ${{ toJSON(github.event) }}
+      # - name: Check calling repo/user
+      #   if: ${{ github.event_name == 'repository_dispatch' && github.event.sender != 'mondoo-tools' }}
+      #   run: |
+      #     echo "This user is not allowed to trigger the workflow"
+      #     exit 1
+      - name: Determine Version and Validate
+        id: version
+        env:
+          # Determine which version should be released based on event type
+          VERSION: ${{ (github.event_name == 'workflow_dispatch' && inputs.version) || github.event.client_payload.version }}
+        run: |
+          # Semantic Versioning regex (with optional 'v' prefix)
+          if [[ ! "$VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version is not a valid semantic version."
+            exit 1
+          fi
+          echo "Version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       # Use SSH keys for checking out the code
       # https://github.com/peter-evans/create-pull-request/issues/48
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#push-using-ssh-deploy-keys
@@ -27,21 +50,6 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ssh-key: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
-
-      # Determine which version should be released based on event type
-      - name: Set Version (Workflow Dispatch)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo VERSION=${{ inputs.version }} >> $GITHUB_ENV
-      - name: Set Version (Repository Dispatch)
-        if: github.event_name == 'repository_dispatch'
-        run: |
-          echo VERSION=${{ github.event.client_payload.version }} >> $GITHUB_ENV
-      - name: Unified Version
-        id: version
-        run: |
-          echo "Version: $VERSION"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Import environment variables from file
         run: cat ".github/env" >> $GITHUB_ENV
@@ -83,5 +91,3 @@ jobs:
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
-
-

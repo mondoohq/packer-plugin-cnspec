@@ -79,6 +79,15 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Dump context
+        run: echo $JSON
+        env:
+          JSON: ${{ toJSON(github.event) }}
+      - name: Check originating repo of PR
+        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo "This repo is not allowed for auto merge"
+          exit 1
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       # figure out the PR for this commit
