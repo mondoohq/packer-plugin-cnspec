@@ -21,11 +21,11 @@ jobs:
         run: echo $JSON
         env:
           JSON: ${{ toJSON(github.event) }}
-      # - name: Check calling repo/user
-      #   if: ${{ github.event_name == 'repository_dispatch' && github.event.sender != 'mondoo-tools' }}
-      #   run: |
-      #     echo "This user is not allowed to trigger the workflow"
-      #     exit 1
+      - name: Check calling user
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.sender.login != 'mondoo-tools' }}
+        run: |
+          echo "This user is not allowed to trigger the workflow"
+          exit 1
       - name: Determine Version and Validate
         id: version
         env:
