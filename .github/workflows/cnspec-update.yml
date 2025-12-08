@@ -17,10 +17,6 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Dump context
-        run: echo $JSON
-        env:
-          JSON: ${{ toJSON(github.event) }}
       - name: Check calling user
         if: ${{ github.event_name == 'repository_dispatch' && github.event.sender.login != 'mondoo-tools' }}
         run: |
