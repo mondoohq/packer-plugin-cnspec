@@ -5,8 +5,8 @@ go 1.25.1
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
-	go.mondoo.com/cnquery/v12 v12.16.0
-	go.mondoo.com/cnspec/v12 v12.16.0
+	go.mondoo.com/cnquery/v12 v12.17.0
+	go.mondoo.com/cnspec/v12 v12.17.0
 )
 
 require (
@@ -207,6 +207,7 @@ require (
 	github.com/olekukonko/tablewriter v1.1.2 // indirect
 	github.com/onsi/gomega v1.35.1 // indirect
 	github.com/package-url/packageurl-go v0.1.3 // indirect
+	github.com/pandatix/go-cvss v0.6.2 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pjbgf/sha1cd v0.5.0 // indirect
@@ -245,7 +246,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	go.mondoo.com/mondoo-go v0.0.0-20251224000430-5db65c48db4d // indirect
+	go.mondoo.com/mondoo-go v0.0.0-20251230082919-30dddec20321 // indirect
 	go.mondoo.com/ranger-rpc v0.7.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.38.0 // indirect
