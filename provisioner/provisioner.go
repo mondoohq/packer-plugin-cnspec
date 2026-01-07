@@ -77,11 +77,11 @@ type Config struct {
 	// The asset name passed to Mondoo Platform. Defaults to the hostname
 	// of the instance.
 	AssetName string `mapstructure:"asset_name"`
-	// Configure behavior whether packer should fail if `scan_threshold` is
-	// not met. If `scan_threshold` configuration is omitted, the threshold
+	// Configure behavior whether packer should fail if `risk_threshold` is
+	// not met. If `risk_threshold` configuration is omitted, the threshold
 	// is set to `0` and builds will pass regardless of what score is
 	// returned.
-	// If `score_threshold` is set to a value, and `on_failure = "continue"`
+	// If `risk_threshold` is set to a value, and `on_failure = "continue"`
 	// builds will continue regardless of what score is returned.
 	OnFailure string `mapstructure:"on_failure"`
 	// Configure an optional map of `key/val` labels for the asset in
@@ -113,10 +113,10 @@ type Config struct {
 	Output string `mapstructure:"output"`
 	// Set output target. E.g. path to local file
 	OutputTarget string `mapstructure:"output_target"`
-	// An integer value to set the `score_threshold` of mondoo scans. Defaults to
+	// An integer value to set the `risk_threshold` of mondoo scans. Defaults to
 	// `0` which results in a passing score regardless of what scan results are
 	// returned.
-	ScoreThreshold int `mapstructure:"score_threshold"`
+	RiskThreshold int `mapstructure:"risk_threshold"`
 	// The path to the Mondoo's service account. Defaults to
 	// `$HOME/.config/mondoo/mondoo.yml`
 	MondooConfigPath string `mapstructure:"mondoo_config_path"`
@@ -645,9 +645,9 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	if p.config.OnFailure == "continue" {
 		// ignore the result of the scan
 		scoreThreshold = 0
-	} else if p.config.ScoreThreshold != 0 {
+	} else if p.config.RiskThreshold != 0 {
 		// user overwrite the default score threshold
-		scoreThreshold = p.config.ScoreThreshold
+		scoreThreshold = p.config.RiskThreshold
 	}
 
 	if report.GetWorstScore() < uint32(scoreThreshold) {

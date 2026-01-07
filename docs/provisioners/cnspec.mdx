@@ -17,7 +17,7 @@ Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://m
 ```hcl
 provisioner "cnspec" {
   on_failure          = "continue"
-  score_threshold     = 85
+  risk_threshold      = 85
   sudo {
     active = true
   }

@@ -7,7 +7,7 @@ Packer plugin [cnspec](https://github.com/mondoohq/cnspec) by [Mondoo](https://m
 ```hcl
 provisioner "cnspec" {
   on_failure          = "continue"
-  score_threshold     = 85
+  risk_threshold      = 85
   sudo {
     active = true
   }
@@ -60,11 +60,11 @@ Optional Parameters:
 - `asset_name` (string) - The asset name passed to Mondoo Platform. Defaults to the hostname
   of the instance.
 
-- `on_failure` (string) - Configure behavior whether packer should fail if `scan_threshold` is
-  not met. If `scan_threshold` configuration is omitted, the threshold
+- `on_failure` (string) - Configure behavior whether packer should fail if `risk_threshold` is
+  not met. If `risk_threshold` configuration is omitted, the threshold
   is set to `0` and builds will pass regardless of what score is
   returned.
-  If `score_threshold` is set to a value, and `on_failure = "continue"`
+  If `risk_threshold` is set to a value, and `on_failure = "continue"`
   builds will continue regardless of what score is returned.
 
 - `labels` (map[string]string) - Configure an optional map of `key/val` labels for the asset in
@@ -96,7 +96,7 @@ Optional Parameters:
 
 - `output_target` (string) - Set output target. E.g. path to local file
 
-- `score_threshold` (int) - An integer value to set the `score_threshold` of mondoo scans. Defaults to
+- `risk_threshold` (int) - An integer value to set the `risk_threshold` of mondoo scans. Defaults to
   `0` which results in a passing score regardless of what scan results are
   returned.
 

@@ -226,7 +226,7 @@ build {
 
   provisioner "cnspec" {
     #on_failure      = "continue"
-    #score_threshold = 85
+    #risk_threshold = 85
     #mondoo_config_path = "/Path/To/Mondoo/config.yml"
     asset_name         = local.vm_name
     debug = true
