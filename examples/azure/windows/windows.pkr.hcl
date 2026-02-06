@@ -71,7 +71,7 @@ build {
 
   provisioner "cnspec" {
     asset_name      = "${var.imageName}-${var.imageVersion}"
-    # score_threshold = 80
+    # risk_threshold = 80
     on_failure      = "continue"
     debug           = false
     annotations     = {

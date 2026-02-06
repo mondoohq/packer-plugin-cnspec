@@ -82,7 +82,7 @@ build {
 
     asset_name = "test-name"
     output = "json"
-    score_threshold = 50
+    risk_threshold = 50
 
     annotations = {
       name = "Packer Builder"
