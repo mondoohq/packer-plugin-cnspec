@@ -79,10 +79,10 @@ type Config struct {
 	AssetName string `mapstructure:"asset_name"`
 	// Configure behavior whether packer should fail if `risk_threshold` is
 	// not met. If `risk_threshold` configuration is omitted, the threshold
-	// is set to `0` and builds will pass regardless of what score is
-	// returned.
-	// If `risk_threshold` is set to a value, and `on_failure = "continue"`
-	// builds will continue regardless of what score is returned.
+	// defaults to `100` and builds will fail unless the scan achieves a
+	// perfect score.
+	// If `on_failure = "continue"` builds will continue regardless of what
+	// score is returned.
 	OnFailure string `mapstructure:"on_failure"`
 	// Configure an optional map of `key/val` labels for the asset in
 	// Mondoo Platform.
@@ -114,9 +114,11 @@ type Config struct {
 	// Set output target. E.g. path to local file
 	OutputTarget string `mapstructure:"output_target"`
 	// An integer value to set the `risk_threshold` of mondoo scans. Defaults to
-	// `0` which results in a passing score regardless of what scan results are
-	// returned.
+	// `100` which requires a perfect score to pass. Set to a lower value to allow
+	// builds with some findings to pass.
 	RiskThreshold int `mapstructure:"risk_threshold"`
+	// Deprecated: Use `risk_threshold` instead. This field will be removed in a future release.
+	ScoreThreshold int `mapstructure:"score_threshold"`
 	// The path to the Mondoo's service account. Defaults to
 	// `$HOME/.config/mondoo/mondoo.yml`
 	MondooConfigPath string `mapstructure:"mondoo_config_path"`
@@ -190,6 +192,14 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 
 	if errs != nil && len(errs.Errors) > 0 {
 		return errs
+	}
+
+	// Handle deprecated score_threshold field
+	if p.config.ScoreThreshold != 0 {
+		log.Println("WARNING: 'score_threshold' is deprecated and will be removed in a future release. Please use 'risk_threshold' instead.")
+		if p.config.RiskThreshold == 0 {
+			p.config.RiskThreshold = 100 - p.config.ScoreThreshold
+		}
 	}
 
 	return nil

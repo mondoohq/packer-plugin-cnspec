@@ -33,10 +33,10 @@
 
 - `on_failure` (string) - Configure behavior whether packer should fail if `risk_threshold` is
   not met. If `risk_threshold` configuration is omitted, the threshold
-  is set to `0` and builds will pass regardless of what score is
-  returned.
-  If `risk_threshold` is set to a value, and `on_failure = "continue"`
-  builds will continue regardless of what score is returned.
+  defaults to `100` and builds will fail unless the scan achieves a
+  perfect score.
+  If `on_failure = "continue"` builds will continue regardless of what
+  score is returned.
 
 - `labels` (map[string]string) - Configure an optional map of `key/val` labels for the asset in
   Mondoo Platform.
@@ -68,8 +68,10 @@
 - `output_target` (string) - Set output target. E.g. path to local file
 
 - `risk_threshold` (int) - An integer value to set the `risk_threshold` of mondoo scans. Defaults to
-  `0` which results in a passing score regardless of what scan results are
-  returned.
+  `100` which requires a perfect score to pass. Set to a lower value to allow
+  builds with some findings to pass.
+
+- `score_threshold` (int) - Deprecated: Use `risk_threshold` instead. This field will be removed in a future release.
 
 - `mondoo_config_path` (string) - The path to the Mondoo's service account. Defaults to
   `$HOME/.config/mondoo/mondoo.yml`
