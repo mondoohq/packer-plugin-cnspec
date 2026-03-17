@@ -26,13 +26,13 @@ VERSION=${LATEST_VERSION_TAG}-$(shell git rev-list --count HEAD)
 endif
 
 ifndef CNSPEC_VERSION
-CNSPEC_VERSION=$(shell go list -json -m go.mondoo.com/cnspec/v12 | jq -r ".Version")
+CNSPEC_VERSION=$(shell go list -json -m go.mondoo.com/cnspec/v13 | jq -r ".Version")
 endif
 
 .PHONY: dev
 
 build:
-	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/cnquery/v10.Version=${CNSPEC_VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Version=${VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Build=${TAG}"
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/mql/v13.Version=${CNSPEC_VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Version=${VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Build=${TAG}"
 
 dev: build
 	@mkdir -p ~/.packer.d/plugins/
