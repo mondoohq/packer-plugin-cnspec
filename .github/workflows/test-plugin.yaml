@@ -25,13 +25,13 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Init
-        uses: hashicorp/packer-github-actions@master
+        uses: hashicorp/packer-github-actions@c3d53c525d422944e50ee27b840746d6522b08de # v3.2.0
         with:
           working_directory: ${{ github.event.inputs.folder }}
           command: init
 
       - name: Validate
-        uses: hashicorp/packer-github-actions@master
+        uses: hashicorp/packer-github-actions@c3d53c525d422944e50ee27b840746d6522b08de # v3.2.0
         with:
           working_directory: ${{ github.event.inputs.folder }}
           command: validate
@@ -39,7 +39,7 @@ jobs:
           PACKER_LOG: ${{ github.event.inputs.logs }}
 
       - name: Build
-        uses: hashicorp/packer-github-actions@master
+        uses: hashicorp/packer-github-actions@c3d53c525d422944e50ee27b840746d6522b08de # v3.2.0
         with:
           working_directory: ${{ github.event.inputs.folder }}
           command: build
