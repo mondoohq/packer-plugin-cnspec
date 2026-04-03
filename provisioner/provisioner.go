@@ -128,6 +128,37 @@ type SudoConfig struct {
 	Active bool `mapstructure:"active"`
 }
 
+// convertScoreToRiskThreshold converts a deprecated score_threshold to a risk_threshold.
+// If riskThreshold is already set, it takes precedence.
+// TODO: Using riskThreshold == 0 as a sentinel for "not set" means a user cannot
+// explicitly set risk_threshold: 0 to override a deprecated score_threshold.
+// Consider using a pointer (*int) or a separate flag to distinguish "zero" from "unset".
+func convertScoreToRiskThreshold(scoreThreshold, riskThreshold int) int {
+	if riskThreshold == 0 {
+		return 100 - scoreThreshold
+	}
+	return riskThreshold
+}
+
+// determineScoreThreshold returns the effective score threshold based on config.
+func determineScoreThreshold(onFailure string, riskThreshold int) int {
+	if onFailure == "continue" {
+		return 0
+	}
+	if riskThreshold != 0 {
+		return riskThreshold
+	}
+	return 100
+}
+
+// scorePassesThreshold returns true if the score meets or exceeds the threshold.
+func scorePassesThreshold(score uint32, threshold int) bool {
+	if threshold < 0 {
+		return true
+	}
+	return score >= uint32(threshold)
+}
+
 func validateFileConfig(name string, config string, req bool) error {
 	if req {
 		if name == "" {
@@ -197,9 +228,7 @@ func (p *Provisioner) Prepare(raws ...interface{}) error {
 	// Handle deprecated score_threshold field
 	if p.config.ScoreThreshold != 0 {
 		log.Println("WARNING: 'score_threshold' is deprecated and will be removed in a future release. Please use 'risk_threshold' instead.")
-		if p.config.RiskThreshold == 0 {
-			p.config.RiskThreshold = 100 - p.config.ScoreThreshold
-		}
+		p.config.RiskThreshold = convertScoreToRiskThreshold(p.config.ScoreThreshold, p.config.RiskThreshold)
 	}
 
 	return nil
@@ -651,16 +680,9 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	// default is to pass all controls
-	scoreThreshold := 100
-	if p.config.OnFailure == "continue" {
-		// ignore the result of the scan
-		scoreThreshold = 0
-	} else if p.config.RiskThreshold != 0 {
-		// user overwrite the default score threshold
-		scoreThreshold = p.config.RiskThreshold
-	}
+	scoreThreshold := determineScoreThreshold(p.config.OnFailure, p.config.RiskThreshold)
 
-	if report.GetWorstScore() < uint32(scoreThreshold) {
+	if !scorePassesThreshold(report.GetWorstScore(), scoreThreshold) {
 		return fmt.Errorf("scan has completed with %d score, does not pass score threshold %d", report.GetWorstScore(), scoreThreshold)
 	}
 
