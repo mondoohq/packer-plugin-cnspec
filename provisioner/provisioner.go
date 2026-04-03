@@ -130,6 +130,9 @@ type SudoConfig struct {
 
 // convertScoreToRiskThreshold converts a deprecated score_threshold to a risk_threshold.
 // If riskThreshold is already set, it takes precedence.
+// TODO: Using riskThreshold == 0 as a sentinel for "not set" means a user cannot
+// explicitly set risk_threshold: 0 to override a deprecated score_threshold.
+// Consider using a pointer (*int) or a separate flag to distinguish "zero" from "unset".
 func convertScoreToRiskThreshold(scoreThreshold, riskThreshold int) int {
 	if riskThreshold == 0 {
 		return 100 - scoreThreshold
@@ -150,6 +153,9 @@ func determineScoreThreshold(onFailure string, riskThreshold int) int {
 
 // scorePassesThreshold returns true if the score meets or exceeds the threshold.
 func scorePassesThreshold(score uint32, threshold int) bool {
+	if threshold < 0 {
+		return true
+	}
 	return score >= uint32(threshold)
 }
 

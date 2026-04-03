@@ -34,6 +34,12 @@ func TestConvertScoreToRiskThreshold(t *testing.T) {
 			riskThreshold:  0,
 			expected:       0,
 		},
+		{
+			name:           "both zero returns 100",
+			scoreThreshold: 0,
+			riskThreshold:  0,
+			expected:       100, // 100 - 0; caller guards against calling with scoreThreshold==0
+		},
 	}
 
 	for _, tt := range tests {
@@ -120,6 +126,12 @@ func TestScorePassesThreshold(t *testing.T) {
 			name:       "any score passes with threshold 0",
 			score:      0,
 			threshold:  0,
+			shouldPass: true,
+		},
+		{
+			name:       "negative threshold always passes",
+			score:      0,
+			threshold:  -1,
 			shouldPass: true,
 		},
 	}
