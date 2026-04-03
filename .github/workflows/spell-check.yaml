@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   spelling:
@@ -16,7 +16,6 @@ jobs:
       actions: read
       contents: read
       pull-requests: read
-      security-events: write
     outputs:
       followup: ${{ steps.spelling.outputs.followup }}
     runs-on: ubuntu-latest
@@ -52,7 +51,6 @@ jobs:
       actions: read
       contents: read
       pull-requests: write
-      security-events: write
     if: (success() || failure()) && needs.spelling.outputs.followup
     steps:
       - name: comment
