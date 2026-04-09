@@ -1033,8 +1033,8 @@ github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmB
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=
-go.mondoo.com/cnspec/v13 v13.4.0 h1:hF4DEZrrP6YJ5kMZ/NeujUNH5TH3Cy9CBHivE4NciTQ=
-go.mondoo.com/cnspec/v13 v13.4.0/go.mod h1:KH6bSrkRuF9P4Pl1EQ1hEHKeE9diSkMwZTfRfI7heSM=
+go.mondoo.com/cnspec/v13 v13.4.1 h1:ohJDtD9uAyslYMcPLyltXJkTvxgQvEjp93phE7xKQdw=
+go.mondoo.com/cnspec/v13 v13.4.1/go.mod h1:KH6bSrkRuF9P4Pl1EQ1hEHKeE9diSkMwZTfRfI7heSM=
 go.mondoo.com/mondoo-go v0.0.0-20260404001504-4c75e5a3471a h1:v4zJPN1MH6X0lpCw21GFTPUbyVR9FKSCaI9ApT1vmIo=
 go.mondoo.com/mondoo-go v0.0.0-20260404001504-4c75e5a3471a/go.mod h1:71ONiTX5I/jMdghOaeovcexBvxPvD1WcZqAEzz4RGOs=
 go.mondoo.com/mql/v13 v13.4.0 h1:TMrAnfbdr9rJHN+SG/P/DtLECDthRJVnc7gGb8vJucs=
