@@ -46,7 +46,7 @@ jobs:
         id: generate-token
         uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         with:
-          app-id: ${{ secrets.MONDOO_MERGEBOT_APP_ID }}
+          client-id: ${{ secrets.MONDOO_MERGEBOT_APP_ID }}
           private-key: ${{ secrets.MONDOO_MERGEBOT_APP_PRIVATE_KEY }}
       - name: Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
