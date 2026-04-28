@@ -64,17 +64,17 @@ jobs:
           # Retry `go get` to tolerate sum.golang.org / proxy.golang.org
           # propagation delay for freshly published tags (seen as 404 on
           # sum.golang.org/lookup/...).
-          attempt=1
+          attempts_made=0
           max_attempts=6
           until go get "${MODULE}"; do
-            if [ $attempt -ge $max_attempts ]; then
+            attempts_made=$((attempts_made + 1))
+            if [ $attempts_made -ge $max_attempts ]; then
               echo "go get failed after ${max_attempts} attempts"
               exit 1
             fi
-            sleep_seconds=$((attempt * 30))
-            echo "go get attempt ${attempt} failed; retrying in ${sleep_seconds}s..."
+            sleep_seconds=$((attempts_made * 30))
+            echo "go get attempt ${attempts_made}/${max_attempts} failed; retrying in ${sleep_seconds}s..."
             sleep $sleep_seconds
-            attempt=$((attempt + 1))
           done
           go mod tidy
           echo "$VERSION" > VERSION
