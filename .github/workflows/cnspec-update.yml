@@ -56,11 +56,28 @@ jobs:
           check-latest: true
           cache: false
       - name: Bump cnspec
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          MAJOR=$(echo "${{ steps.version.outputs.version }}" | cut -d. -f1)
-          go get go.mondoo.com/cnspec/${MAJOR}@${{ steps.version.outputs.version }}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MODULE="go.mondoo.com/cnspec/${MAJOR}@${VERSION}"
+          # Retry `go get` to tolerate sum.golang.org / proxy.golang.org
+          # propagation delay for freshly published tags (seen as 404 on
+          # sum.golang.org/lookup/...).
+          attempts_made=0
+          max_attempts=6
+          until go get "${MODULE}"; do
+            attempts_made=$((attempts_made + 1))
+            if [ $attempts_made -ge $max_attempts ]; then
+              echo "go get failed after ${max_attempts} attempts"
+              exit 1
+            fi
+            sleep_seconds=$((attempts_made * 30))
+            echo "go get attempt ${attempts_made}/${max_attempts} failed; retrying in ${sleep_seconds}s..."
+            sleep $sleep_seconds
+          done
           go mod tidy
-          echo "${{ steps.version.outputs.version }}" > VERSION
+          echo "$VERSION" > VERSION
 
       - name: Prepare title and branch name
         id: branch
