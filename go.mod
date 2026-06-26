@@ -1,12 +1,12 @@
 module go.mondoo.com/packer-plugin-cnspec
 
-go 1.26.3
+go 1.26.4
 
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
-	go.mondoo.com/cnspec/v13 v13.24.1
-	go.mondoo.com/mql/v13 v13.24.1
+	go.mondoo.com/cnspec/v13 v13.24.2
+	go.mondoo.com/mql/v13 v13.24.2
 )
 
 require (
@@ -207,7 +207,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	go.mondoo.com/mondoo-go v0.0.0-20260624002826-255868a855f8 // indirect
+	go.mondoo.com/mondoo-go v0.0.0-20260625124450-d02b3d289fd3 // indirect
 	go.mondoo.com/ranger-rpc v0.8.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
