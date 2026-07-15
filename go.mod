@@ -5,8 +5,8 @@ go 1.26.4
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
 
 require (
-	go.mondoo.com/cnspec/v13 v13.29.0
-	go.mondoo.com/mql/v13 v13.29.0
+	go.mondoo.com/cnspec/v13 v13.29.1
+	go.mondoo.com/mql/v13 v13.29.1
 )
 
 require (
