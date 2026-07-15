@@ -41,6 +41,12 @@ import (
 	"go.mondoo.com/mql/v13/providers-sdk/v1/vault"
 	"go.mondoo.com/packer-plugin-cnspec/provisioner/version"
 	"golang.org/x/crypto/ssh"
+
+	// Register the sqlite driver used by cnspec's scan data store
+	// (scan.NewLocalScanner opens "sqlite" via database/sql). This is the same
+	// library cnspec's own binary blank-imports; without it, scans fail with
+	// `sql: unknown driver "sqlite" (forgotten import?)`.
+	_ "github.com/glebarez/go-sqlite"
 )
 
 type Config struct {

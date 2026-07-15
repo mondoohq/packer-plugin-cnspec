@@ -4,10 +4,24 @@
 package provisioner
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// TestSQLiteDriverRegistered guards against a regression where the embedded
+// cnspec scan library opens a sqlite database (via scan.NewLocalScanner) but the
+// sqlite driver is never linked into the plugin binary, producing:
+//
+//	failed to open sqlite file: sql: unknown driver "sqlite" (forgotten import?)
+//
+// The driver is registered by a blank import of the same library cnspec uses
+// (github.com/glebarez/go-sqlite).
+func TestSQLiteDriverRegistered(t *testing.T) {
+	assert.Contains(t, sql.Drivers(), "sqlite",
+		"sqlite driver must be registered; blank-import github.com/glebarez/go-sqlite")
+}
 
 func TestConvertScoreToRiskThreshold(t *testing.T) {
 	tests := []struct {
