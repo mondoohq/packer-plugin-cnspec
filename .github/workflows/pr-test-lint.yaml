@@ -2,6 +2,7 @@ name: Build Packer Plugin
 
 ## Only trigger tests if source is changing
 on:
+  workflow_dispatch: # manual trigger to test-build on the runners without shipping (goreleaser stays --snapshot --skip=publish)
   push:
     paths:
       - "**.go"
