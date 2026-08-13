@@ -9,7 +9,7 @@ on:
 jobs:
   goreleaser:
     runs-on:
-      group: Default
+      group: arc-runners
     env:
       RUNNER_TYPE: "self-hosted"
     timeout-minutes: 120
