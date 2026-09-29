@@ -28,8 +28,9 @@ jobs:
           # Determine which version should be released based on event type
           VERSION: ${{ (github.event_name == 'workflow_dispatch' && inputs.version) || github.event.client_payload.version }}
         run: |
-          # Semantic Versioning regex (with optional 'v' prefix)
-          if [[ ! "$VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          # Semantic Versioning regex (with optional 'v' prefix). Pre-releases
+          # pass here so the guard below can skip them without failing the run.
+          if [[ ! "$VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "Error: Version is not a valid semantic version."
             exit 1
           fi
@@ -47,10 +48,16 @@ jobs:
         with:
           ssh-key: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
 
-      # cnspec also releases patches on the branch of a previous major, and those
-      # are dispatched here too. `go get` pins the exact commit, so bumping to
-      # one of them would downgrade cnspec and set VERSION back. Only continue
-      # if the requested version is newer than the current one.
+      # Only stable releases newer than the current one are bumped to.
+      #
+      # Pre-releases (rc, pre, ...) are skipped: the plugin only ships stable
+      # cnspec. While a new major is still in rc on main, stable patches keep
+      # coming from the previous major's branch, and those are newer than what
+      # we have, so they still go through (as v13.36-v13.39 did during v14 rc).
+      #
+      # Once the new major is stable, patches from the previous major's branch
+      # are older than what we have. `go get` pins the exact commit, so bumping
+      # to one of them would downgrade cnspec and set VERSION back.
       - name: Skip versions that are not newer
         id: guard
         env:
@@ -59,7 +66,12 @@ jobs:
           CURRENT=$(tr -d '[:space:]' < VERSION)
           CURRENT="${CURRENT#v}"
           REQUESTED="${REQUESTED#v}"
-          # sort -V is exact here, the validation above only allows X.Y.Z
+          if [[ "$REQUESTED" == *-* ]]; then
+            echo "::notice::Skipping cnspec v${REQUESTED}: pre-releases are not bumped to"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # sort -V is exact here: pre-releases were skipped above, so both are X.Y.Z
           NEWEST=$(printf '%s\n%s\n' "$CURRENT" "$REQUESTED" | sort -V | tail -n1)
           if [ "$NEWEST" = "$CURRENT" ]; then
             echo "::notice::Skipping cnspec v${REQUESTED}: not newer than the current v${CURRENT}"
