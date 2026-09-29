@@ -91,55 +91,58 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Every output goes through the delimiter form, so no value can end
+          # its own line early and inject another output.
+          out() {
+            printf '%s<<__OUT__\n%s\n__OUT__\n' "$1" "$2" >> "$GITHUB_OUTPUT"
+          }
+
           # The release job only lets a semver version through, so it needs no
           # escaping for the YAML scalar, the Slack text or the URL it lands in.
           # It is empty when the release job stopped before reading VERSION.
           VERSION=${VERSION:-unknown}
+          out version "$VERSION"
+
           # Link the release only when it was actually created; otherwise the
           # tag it points at does not exist.
           if [ "$RELEASE" = "success" ]; then
-            notes="<https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION|$VERSION>"
+            out notes "<https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION|$VERSION>"
           else
-            notes="none, no release was created"
+            out notes "none, no release was created"
           fi
-          {
-            echo "version=$VERSION"
-            echo "notes=$notes"
-          } >> "$GITHUB_OUTPUT"
+
+          # Runner-provided values are read from the environment here, like
+          # everything else, rather than pasted into the payload as expressions.
+          out repository "$GITHUB_REPOSITORY"
+          out actor "$GITHUB_ACTOR"
+          out run_url "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
           # The job result decides: it is success only when every step, the
           # release and the build check included, succeeded.
-          ok=false
           if [ "$JOB" = "success" ]; then
-            ok=true
-          fi
-
-          if [ "$ok" = "true" ]; then
-            echo "header=:rocket: packer-plugin-cnspec $VERSION released" >> "$GITHUB_OUTPUT"
-            echo "mention=" >> "$GITHUB_OUTPUT"
+            out header ":rocket: packer-plugin-cnspec $VERSION released"
+            out mention ""
           else
-            echo "header=:x: packer-plugin-cnspec $VERSION failed to release" >> "$GITHUB_OUTPUT"
-            echo "mention=<!here> " >> "$GITHUB_OUTPUT"
+            out header ":x: packer-plugin-cnspec $VERSION failed to release"
+            out mention "<!here> "
           fi
 
           # Packer releases are always stable and marked as latest.
-          echo "channel_line=:package: *stable* — this is what a default install gets" >> "$GITHUB_OUTPUT"
+          out channel_line ":package: *stable* — this is what a default install gets"
 
           # Emits the value only. The label and the newline stay in the Slack payload,
           # where `\n` inside a double-quoted YAML scalar is a real escape.
           status() {
             case "$1" in
-              success) echo ":white_check_mark: Done" ;;
-              skipped) echo ":double_vertical_bar: Skipped" ;;
+              success)   echo ":white_check_mark: Done" ;;
+              skipped)   echo ":double_vertical_bar: Skipped" ;;
               cancelled) echo ":no_entry_sign: Cancelled" ;;
-              "")      echo ":grey_question: Not run" ;;
-              *)       echo ":x: $1" ;;
+              "")        echo ":grey_question: Not run" ;;
+              *)         echo ":x: $1" ;;
             esac
           }
-          {
-            echo "release_status=$(status "$RELEASE")"
-            echo "build_status=$(status "$BUILD")"
-          } >> "$GITHUB_OUTPUT"
+          out release_status "$(status "$RELEASE")"
+          out build_status "$(status "$BUILD")"
 
       - name: Post to Slack
         continue-on-error: true
@@ -163,13 +166,13 @@ jobs:
               - type: "section"
                 fields:
                   - type: "mrkdwn"
-                    text: "*Repository:*\n`${{ github.repository }}`"
+                    text: "*Repository:*\n`${{ steps.meta.outputs.repository }}`"
                   - type: "mrkdwn"
                     text: "*Version:*\n`${{ steps.meta.outputs.version }}`"
                   - type: "mrkdwn"
-                    text: "*Triggered by:*\n${{ github.actor }}"
+                    text: "*Triggered by:*\n${{ steps.meta.outputs.actor }}"
                   - type: "mrkdwn"
-                    text: "*Workflow run:*\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Open run>"
+                    text: "*Workflow run:*\n<${{ steps.meta.outputs.run_url }}|Open run>"
               - type: "section"
                 fields:
                   - type: "mrkdwn"
