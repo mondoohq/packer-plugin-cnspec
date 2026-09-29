@@ -59,8 +59,23 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          MAJOR=$(echo "$VERSION" | cut -d. -f1)
-          MODULE="go.mondoo.com/cnspec/${MAJOR}@${VERSION}"
+          # Since v14 cnspec is published without a /vN module suffix, so Go
+          # does not accept the tag as a version. Resolve the tag to its commit
+          # and let `go get` turn that into a pseudo-version.
+          REMOTE="https://github.com/mondoohq/cnspec"
+          TAG="v${VERSION#v}"
+          REFS=$(git ls-remote "$REMOTE" "refs/tags/${TAG}^{}" "refs/tags/${TAG}")
+          # Prefer the peeled commit of an annotated tag, else the plain ref.
+          SHA=$(echo "$REFS" | awk '/\^\{\}$/ {print $1; exit}')
+          if [ -z "$SHA" ]; then
+            SHA=$(echo "$REFS" | awk 'NR==1 {print $1}')
+          fi
+          if [ -z "$SHA" ]; then
+            echo "could not resolve tag ${TAG} in ${REMOTE}"
+            exit 1
+          fi
+          echo "Resolved ${TAG} to ${SHA}"
+          MODULE="go.mondoo.com/cnspec@${SHA}"
           # Retry `go get` to tolerate sum.golang.org / proxy.golang.org
           # propagation delay for freshly published tags (seen as 404 on
           # sum.golang.org/lookup/...).

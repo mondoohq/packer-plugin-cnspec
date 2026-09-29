@@ -27,7 +27,7 @@ jobs:
           check-latest: true
           cache: false
       - name: Set cnspec version
-        run: echo "CNSPEC_VERSION=$(go list -json -m go.mondoo.com/cnspec/v13 | jq -r '.Version')" >> $GITHUB_ENV
+        run: echo "CNSPEC_VERSION=$(cat VERSION)" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
