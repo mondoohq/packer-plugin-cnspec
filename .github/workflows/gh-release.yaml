@@ -91,6 +91,8 @@ jobs:
 
           # The release job only lets a semver version through, so it needs no
           # escaping for the YAML scalar, the Slack text or the URL it lands in.
+          # It is empty when the release job stopped before reading VERSION.
+          VERSION=${VERSION:-unknown}
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
           # The job result decides: it is success only when every step, the
