@@ -19,28 +19,26 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    # Step outcomes and the version are exposed for the notify job.
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release_outcome: ${{ steps.release.outcome }}
+      build_outcome: ${{ steps.check_release_file.outcome }}
     steps:
-      - id: slack
-        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
-            text: "GitHub Actions Run"
-            attachments:
-              - color: "#FFFF00"
-                blocks:
-                  - type: "section"
-                    fields:
-                      - type: "mrkdwn"
-                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
-                      - type: "mrkdwn"
-                        text: "*Status:*\n`In Progress`"
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set release version
-        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        id: version
+        run: |
+          VERSION=$(cat VERSION)
+          # The version becomes a tag, a URL path and Slack text. Holding it to
+          # semver keeps it free of anything any of those would read as markup.
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::VERSION '$VERSION' is not a semver tag like v1.2.3"
+            exit 1
+          fi
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
       # fetch a token for the mondoo-mergebot app
       - name: Generate token
         id: generate-token
@@ -51,12 +49,15 @@ jobs:
           client-id: ${{ secrets.MONDOO_MERGEBOT_APP_ID }}
           private-key: ${{ secrets.MONDOO_MERGEBOT_APP_PRIVATE_KEY }}
       - name: Release
+        id: release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
           generate_release_notes: true
           make_latest: true
           token: ${{ steps.generate-token.outputs.token }}
+      # goreleaser (release.yaml) uploads the assets once the tag exists. This
+      # step waits for them, and its outcome is the "Build" status in Slack.
       - name: Release file present?
         id: check_release_file
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
@@ -68,23 +69,127 @@ jobs:
           warning_on_retry: false
           # error on HTTP code different to 302
           command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
-      - uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
-        if : ${{ always() }}
+
+  notify:
+    name: Report the release to Slack
+    # A skipped release job means nothing was attempted, so there is nothing
+    # to report, and certainly nothing to page @here about.
+    if: ${{ always() && needs.create-gh-release.result != 'skipped' }}
+    needs: [create-gh-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose the message
+        id: meta
+        env:
+          RELEASE: ${{ needs.create-gh-release.outputs.release_outcome }}
+          BUILD: ${{ needs.create-gh-release.outputs.build_outcome }}
+          JOB: ${{ needs.create-gh-release.result }}
+          # Through env rather than `${{ }}` inline: an expression is pasted into
+          # the script before bash parses it, so a value carrying a quote or `$(…)`
+          # would be read as shell rather than as text.
+          VERSION: ${{ needs.create-gh-release.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # Every output goes through the delimiter form with a fresh random
+          # delimiter, so no value can end its own entry early and inject
+          # another output.
+          out() {
+            local eof
+            eof="EOF_$(openssl rand -hex 16)"
+            printf '%s<<%s\n%s\n%s\n' "$1" "$eof" "$2" "$eof" >> "$GITHUB_OUTPUT"
+          }
+
+          # The release job only lets a semver version through, so it needs no
+          # escaping for the YAML scalar, the Slack text or the URL it lands in.
+          # It is empty when the release job stopped before reading VERSION.
+          VERSION=${VERSION:-unknown}
+          out version "$VERSION"
+
+          # Link the release only when it was actually created; otherwise the
+          # tag it points at does not exist.
+          if [ "$RELEASE" = "success" ]; then
+            out notes "<https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION|$VERSION>"
+          else
+            out notes "none, no release was created"
+          fi
+
+          # Runner-provided values are read from the environment here, like
+          # everything else, rather than pasted into the payload as expressions.
+          out repository "$GITHUB_REPOSITORY"
+          out actor "$GITHUB_ACTOR"
+          out run_url "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+          # The job result decides: it is success only when every step, the
+          # release and the build check included, succeeded.
+          if [ "$JOB" = "success" ]; then
+            out header ":rocket: packer-plugin-cnspec $VERSION released"
+            out mention ""
+          else
+            out header ":x: packer-plugin-cnspec $VERSION failed to release"
+            out mention "<!here> "
+          fi
+
+          # Packer releases are always stable and marked as latest.
+          out channel_line ":package: *stable* — this is what a default install gets"
+
+          # Emits the value only. The label and the newline stay in the Slack payload,
+          # where `\n` inside a double-quoted YAML scalar is a real escape.
+          status() {
+            case "$1" in
+              success)   echo ":white_check_mark: Done" ;;
+              skipped)   echo ":double_vertical_bar: Skipped" ;;
+              cancelled) echo ":no_entry_sign: Cancelled" ;;
+              "")        echo ":grey_question: Not run" ;;
+              *)         echo ":x: $1" ;;
+            esac
+          }
+          out release_status "$(status "$RELEASE")"
+          out build_status "$(status "$BUILD")"
+
+      # A Slack outage must not turn a good release red, so the post may fail;
+      # the next step makes sure that failure is still visible on the run.
+      - name: Post to Slack
+        id: slack_post
+        continue-on-error: true
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         with:
-          method: chat.update
+          method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
-            ts: "${{ steps.slack.outputs.ts }}"
-            text: "GitHub Actions Run"
-            attachments:
-              - color: "${{ (steps.check_release_file.outcome == 'success') && '#00FF00' || (steps.check_release_file.outcome == 'failure') && '#FF0000' || '#FFA500' }}"
-                blocks:
-                  - type: "section"
-                    fields:
-                      - type: "mrkdwn"
-                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
-                      - type: "mrkdwn"
-                        text: " "
-                      - type: "mrkdwn"
-                        text: "*Status:*\n`${{ steps.check_release_file.outcome }}`"
+            text: "${{ steps.meta.outputs.mention }}${{ steps.meta.outputs.header }}"
+            blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "${{ steps.meta.outputs.header }}"
+                  emoji: true
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "${{ steps.meta.outputs.channel_line }}"
+              - type: "section"
+                fields:
+                  - type: "mrkdwn"
+                    text: "*Repository:*\n`${{ steps.meta.outputs.repository }}`"
+                  - type: "mrkdwn"
+                    text: "*Version:*\n`${{ steps.meta.outputs.version }}`"
+                  - type: "mrkdwn"
+                    text: "*Triggered by:*\n${{ steps.meta.outputs.actor }}"
+                  - type: "mrkdwn"
+                    text: "*Workflow run:*\n<${{ steps.meta.outputs.run_url }}|Open run>"
+              - type: "section"
+                fields:
+                  - type: "mrkdwn"
+                    text: "*GitHub release:*\n${{ steps.meta.outputs.release_status }}"
+                  - type: "mrkdwn"
+                    text: "*Build:*\n${{ steps.meta.outputs.build_status }}"
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "*Release notes:*\n${{ steps.meta.outputs.notes }}"
+
+      - name: Warn when the Slack post failed
+        if: ${{ steps.slack_post.outcome == 'failure' }}
+        run: echo "::warning::The release notification could not be posted to Slack"
