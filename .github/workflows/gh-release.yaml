@@ -95,7 +95,17 @@ jobs:
           # escaping for the YAML scalar, the Slack text or the URL it lands in.
           # It is empty when the release job stopped before reading VERSION.
           VERSION=${VERSION:-unknown}
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # Link the release only when it was actually created; otherwise the
+          # tag it points at does not exist.
+          if [ "$RELEASE" = "success" ]; then
+            notes="<https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION|$VERSION>"
+          else
+            notes="none, no release was created"
+          fi
+          {
+            echo "version=$VERSION"
+            echo "notes=$notes"
+          } >> "$GITHUB_OUTPUT"
 
           # The job result decides: it is success only when every step, the
           # release and the build check included, succeeded.
@@ -169,4 +179,4 @@ jobs:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "*Release notes:*\n<https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.version }}|${{ steps.meta.outputs.version }}>"
+                  text: "*Release notes:*\n${{ steps.meta.outputs.notes }}"
