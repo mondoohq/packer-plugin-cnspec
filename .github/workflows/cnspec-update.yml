@@ -47,15 +47,38 @@ jobs:
         with:
           ssh-key: ${{ secrets.PACKER_PLUGIN_DEPLOY_KEY_PRIV }}
 
+      # cnspec also releases patches on the branch of a previous major, and those
+      # are dispatched here too. `go get` pins the exact commit, so bumping to
+      # one of them would downgrade cnspec and set VERSION back. Only continue
+      # if the requested version is newer than the current one.
+      - name: Skip versions that are not newer
+        id: guard
+        env:
+          REQUESTED: ${{ steps.version.outputs.version }}
+        run: |
+          CURRENT=$(tr -d '[:space:]' < VERSION)
+          CURRENT="${CURRENT#v}"
+          REQUESTED="${REQUESTED#v}"
+          # sort -V is exact here, the validation above only allows X.Y.Z
+          NEWEST=$(printf '%s\n%s\n' "$CURRENT" "$REQUESTED" | sort -V | tail -n1)
+          if [ "$NEWEST" = "$CURRENT" ]; then
+            echo "::notice::Skipping cnspec v${REQUESTED}: not newer than the current v${CURRENT}"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
       - name: Import environment variables from file
+        if: steps.guard.outputs.skip != 'true'
         run: cat ".github/env" >> $GITHUB_ENV
       - name: Install Go
+        if: steps.guard.outputs.skip != 'true'
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ">=${{ env.golang-version }}"
           check-latest: true
           cache: false
       - name: Bump cnspec
+        if: steps.guard.outputs.skip != 'true'
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
@@ -95,6 +118,7 @@ jobs:
           echo "$VERSION" > VERSION
 
       - name: Prepare title and branch name
+        if: steps.guard.outputs.skip != 'true'
         id: branch
         run: |
           BRANCH_NAME="version/cnspec_update_${{ steps.version.outputs.version }}"
@@ -103,6 +127,7 @@ jobs:
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_OUTPUT
 
       - name: Create PR
+        if: steps.guard.outputs.skip != 'true'
         id: cpr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
@@ -116,7 +141,7 @@ jobs:
           body-path: .github/pr-body.md
 
       - name: PR infos
-        if: ${{ steps.cpr.outputs.pull-request-number }}
+        if: ${{ steps.guard.outputs.skip != 'true' && steps.cpr.outputs.pull-request-number }}
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
