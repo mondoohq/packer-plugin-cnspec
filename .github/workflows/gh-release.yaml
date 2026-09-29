@@ -30,8 +30,15 @@ jobs:
       - name: Set release version
         id: version
         run: |
-          echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
-          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+          VERSION=$(cat VERSION)
+          # The version becomes a tag, a URL path and Slack text. Holding it to
+          # semver keeps it free of anything any of those would read as markup.
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::VERSION '$VERSION' is not a semver tag like v1.2.3"
+            exit 1
+          fi
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
       # fetch a token for the mondoo-mergebot app
       - name: Generate token
         id: generate-token
@@ -63,7 +70,9 @@ jobs:
 
   notify:
     name: Report the release to Slack
-    if: ${{ always() }}
+    # A skipped release job means nothing was attempted, so there is nothing
+    # to report, and certainly nothing to page @here about.
+    if: ${{ always() && needs.create-gh-release.result != 'skipped' }}
     needs: [create-gh-release]
     runs-on: ubuntu-latest
     steps:
@@ -80,39 +89,22 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The version reaches Slack through two different parsers. `ver_safe` is
-          # escaped for both: backslash and quote so the value cannot terminate the
-          # double-quoted YAML scalar it is pasted into, then the three characters
-          # Slack reads as markup. `ver_url` is for the link target, where
-          # percent-encoding rather than escaping is correct.
-          ver_safe=$VERSION
-          ver_safe=${ver_safe//\\/\\\\}
-          ver_safe=${ver_safe//\"/\\\"}
-          ver_safe=${ver_safe//&/&amp;}
-          ver_safe=${ver_safe//</&lt;}
-          ver_safe=${ver_safe//>/&gt;}
-          ver_url=$(jq -rn --arg v "$VERSION" '$v|@uri')
-          {
-            echo "version=$ver_safe"
-            echo "version_url=$ver_url"
-          } >> "$GITHUB_OUTPUT"
+          # The release job only lets a semver version through, so it needs no
+          # escaping for the YAML scalar, the Slack text or the URL it lands in.
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-          # Unlike cnspec, nothing here is skipped by design: every step runs on
-          # a release, so anything but success (skipped, or an empty outcome
-          # when the job stopped before that step) counts as a failed release.
-          ok=true
-          for result in "$JOB" "$RELEASE" "$BUILD"; do
-            case "$result" in
-              success) ;;
-              *) ok=false ;;
-            esac
-          done
+          # The job result decides: it is success only when every step, the
+          # release and the build check included, succeeded.
+          ok=false
+          if [ "$JOB" = "success" ]; then
+            ok=true
+          fi
 
           if [ "$ok" = "true" ]; then
-            echo "header=:rocket: packer-plugin-cnspec $ver_safe released" >> "$GITHUB_OUTPUT"
+            echo "header=:rocket: packer-plugin-cnspec $VERSION released" >> "$GITHUB_OUTPUT"
             echo "mention=" >> "$GITHUB_OUTPUT"
           else
-            echo "header=:x: packer-plugin-cnspec $ver_safe failed to release" >> "$GITHUB_OUTPUT"
+            echo "header=:x: packer-plugin-cnspec $VERSION failed to release" >> "$GITHUB_OUTPUT"
             echo "mention=<!here> " >> "$GITHUB_OUTPUT"
           fi
 
@@ -172,4 +164,4 @@ jobs:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "*Release notes:*\n<https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.version_url }}|${{ steps.meta.outputs.version }}>"
+                  text: "*Release notes:*\n<https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.version }}|${{ steps.meta.outputs.version }}>"
