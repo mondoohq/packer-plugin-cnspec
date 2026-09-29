@@ -19,28 +19,19 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    # Step outcomes and the version are exposed for the notify job.
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release_outcome: ${{ steps.release.outcome }}
+      build_outcome: ${{ steps.check_release_file.outcome }}
     steps:
-      - id: slack
-        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
-            text: "GitHub Actions Run"
-            attachments:
-              - color: "#FFFF00"
-                blocks:
-                  - type: "section"
-                    fields:
-                      - type: "mrkdwn"
-                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
-                      - type: "mrkdwn"
-                        text: "*Status:*\n`In Progress`"
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set release version
-        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        id: version
+        run: |
+          echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
       # fetch a token for the mondoo-mergebot app
       - name: Generate token
         id: generate-token
@@ -51,6 +42,7 @@ jobs:
           client-id: ${{ secrets.MONDOO_MERGEBOT_APP_ID }}
           private-key: ${{ secrets.MONDOO_MERGEBOT_APP_PRIVATE_KEY }}
       - name: Release
+        id: release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
@@ -68,23 +60,115 @@ jobs:
           warning_on_retry: false
           # error on HTTP code different to 302
           command: curl -o /dev/null -s -w "%{http_code}\n" "https://github.com/mondoohq/packer-plugin-cnspec/releases/download/${{ env.RELEASE_VERSION }}/packer-plugin-cnspec_${{ env.RELEASE_VERSION }}_SHA256SUMS" | grep 302
-      - uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
-        if : ${{ always() }}
+
+  notify:
+    name: Report the release to Slack
+    if: ${{ always() }}
+    needs: [create-gh-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose the message
+        id: meta
+        env:
+          RELEASE: ${{ needs.create-gh-release.outputs.release_outcome }}
+          BUILD: ${{ needs.create-gh-release.outputs.build_outcome }}
+          JOB: ${{ needs.create-gh-release.result }}
+          # Through env rather than `${{ }}` inline: an expression is pasted into
+          # the script before bash parses it, so a value carrying a quote or `$(…)`
+          # would be read as shell rather than as text.
+          VERSION: ${{ needs.create-gh-release.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # The version reaches Slack through two different parsers. `ver_safe` is
+          # escaped for both: backslash and quote so the value cannot terminate the
+          # double-quoted YAML scalar it is pasted into, then the three characters
+          # Slack reads as markup. `ver_url` is for the link target, where
+          # percent-encoding rather than escaping is correct.
+          ver_safe=$VERSION
+          ver_safe=${ver_safe//\\/\\\\}
+          ver_safe=${ver_safe//\"/\\\"}
+          ver_safe=${ver_safe//&/&amp;}
+          ver_safe=${ver_safe//</&lt;}
+          ver_safe=${ver_safe//>/&gt;}
+          ver_url=$(jq -rn --arg v "$VERSION" '$v|@uri')
+          {
+            echo "version=$ver_safe"
+            echo "version_url=$ver_url"
+          } >> "$GITHUB_OUTPUT"
+
+          # Skipped is not failed, and neither is an empty outcome when the job
+          # never ran to that step; the job result decides overall success.
+          ok=true
+          for result in "$JOB" "$RELEASE" "$BUILD"; do
+            case "$result" in
+              success) ;;
+              *) ok=false ;;
+            esac
+          done
+
+          if [ "$ok" = "true" ]; then
+            echo "header=:rocket: packer-plugin-cnspec $ver_safe released" >> "$GITHUB_OUTPUT"
+            echo "mention=" >> "$GITHUB_OUTPUT"
+          else
+            echo "header=:x: packer-plugin-cnspec $ver_safe failed to release" >> "$GITHUB_OUTPUT"
+            echo "mention=<!here> " >> "$GITHUB_OUTPUT"
+          fi
+
+          # Packer releases are always stable and marked as latest.
+          echo "channel_line=:package: *stable* — this is what a default install gets" >> "$GITHUB_OUTPUT"
+
+          # Emits the value only. The label and the newline stay in the Slack payload,
+          # where `\n` inside a double-quoted YAML scalar is a real escape.
+          status() {
+            case "$1" in
+              success) echo ":white_check_mark: Done" ;;
+              skipped) echo ":double_vertical_bar: Skipped" ;;
+              "")      echo ":grey_question: Not run" ;;
+              *)       echo ":x: $1" ;;
+            esac
+          }
+          {
+            echo "release_status=$(status "$RELEASE")"
+            echo "build_status=$(status "$BUILD")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post to Slack
+        continue-on-error: true
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         with:
-          method: chat.update
+          method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel: "${{ env.SLACK_BOT_CHANNEL_ID }}"
-            ts: "${{ steps.slack.outputs.ts }}"
-            text: "GitHub Actions Run"
-            attachments:
-              - color: "${{ (steps.check_release_file.outcome == 'success') && '#00FF00' || (steps.check_release_file.outcome == 'failure') && '#FF0000' || '#FFA500' }}"
-                blocks:
-                  - type: "section"
-                    fields:
-                      - type: "mrkdwn"
-                        text: "<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|${{ github.workflow }}>"
-                      - type: "mrkdwn"
-                        text: " "
-                      - type: "mrkdwn"
-                        text: "*Status:*\n`${{ steps.check_release_file.outcome }}`"
+            text: "${{ steps.meta.outputs.mention }}${{ steps.meta.outputs.header }}"
+            blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "${{ steps.meta.outputs.header }}"
+                  emoji: true
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "${{ steps.meta.outputs.channel_line }}"
+              - type: "section"
+                fields:
+                  - type: "mrkdwn"
+                    text: "*Repository:*\n`${{ github.repository }}`"
+                  - type: "mrkdwn"
+                    text: "*Version:*\n`${{ steps.meta.outputs.version }}`"
+                  - type: "mrkdwn"
+                    text: "*Triggered by:*\n${{ github.actor }}"
+                  - type: "mrkdwn"
+                    text: "*Workflow run:*\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Open run>"
+              - type: "section"
+                fields:
+                  - type: "mrkdwn"
+                    text: "*GitHub release:*\n${{ steps.meta.outputs.release_status }}"
+                  - type: "mrkdwn"
+                    text: "*Build:*\n${{ steps.meta.outputs.build_status }}"
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "*Release notes:*\n<https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.version_url }}|${{ steps.meta.outputs.version }}>"
