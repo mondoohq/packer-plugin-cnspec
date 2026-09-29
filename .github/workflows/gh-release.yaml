@@ -56,6 +56,8 @@ jobs:
           generate_release_notes: true
           make_latest: true
           token: ${{ steps.generate-token.outputs.token }}
+      # goreleaser (release.yaml) uploads the assets once the tag exists. This
+      # step waits for them, and its outcome is the "Build" status in Slack.
       - name: Release file present?
         id: check_release_file
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
@@ -119,6 +121,7 @@ jobs:
             case "$1" in
               success) echo ":white_check_mark: Done" ;;
               skipped) echo ":double_vertical_bar: Skipped" ;;
+              cancelled) echo ":no_entry_sign: Cancelled" ;;
               "")      echo ":grey_question: Not run" ;;
               *)       echo ":x: $1" ;;
             esac
