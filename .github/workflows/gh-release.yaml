@@ -97,8 +97,9 @@ jobs:
             echo "version_url=$ver_url"
           } >> "$GITHUB_OUTPUT"
 
-          # Skipped is not failed, and neither is an empty outcome when the job
-          # never ran to that step; the job result decides overall success.
+          # Unlike cnspec, nothing here is skipped by design: every step runs on
+          # a release, so anything but success (skipped, or an empty outcome
+          # when the job stopped before that step) counts as a failed release.
           ok=true
           for result in "$JOB" "$RELEASE" "$BUILD"; do
             case "$result" in
