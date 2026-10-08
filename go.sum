@@ -995,12 +995,12 @@ github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmB
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=
-go.mondoo.com/cnspec v0.0.0-20261006174141-3f089af6e86d h1:rc5JP0+UhK2mrwNIaKQrm6WPC3U+l5O2h0uWqfnVLjY=
-go.mondoo.com/cnspec v0.0.0-20261006174141-3f089af6e86d/go.mod h1:E0oUNpRcajxzxYNMcCytPTwjSQOg4FymrNZEokt2l0E=
+go.mondoo.com/cnspec v0.0.0-20261008172703-eab0c2d0a9e9 h1:jFfck6jVnf5nYpcG37J17Wtk5ff+V5thY1Hoe3N7gQ0=
+go.mondoo.com/cnspec v0.0.0-20261008172703-eab0c2d0a9e9/go.mod h1:Anur7YaSLI8wENQaCaa4K2vCVmOMAJvbJgD3avZcCp4=
 go.mondoo.com/mondoo-go v0.0.0-20261006001321-cdf50e77324e h1:lhmfRqgUn9Xhnb6JyJlgQiSdvBHkacOi8QeOMJLevXk=
 go.mondoo.com/mondoo-go v0.0.0-20261006001321-cdf50e77324e/go.mod h1:hESCStkuJqvuw0cWwVKrorQJJnGdxUnSdR4Zs1/W1W4=
-go.mondoo.com/mql v0.0.0-20261006162448-03086ddd84bf h1:Y5w4U9URWpit3rbdy0FrwuvzTllwo3N/Grp8ftVgqeg=
-go.mondoo.com/mql v0.0.0-20261006162448-03086ddd84bf/go.mod h1:xBy1bhwsDSjHmQGBgr/F4skW72ewB94r8wEaBQB7XjE=
+go.mondoo.com/mql v0.0.0-20261008151825-1d31cdf2a2d4 h1:/V9j5mHkVOu50pXRFKG6vlzfkZYWwnPY6MHfovD//Ko=
+go.mondoo.com/mql v0.0.0-20261008151825-1d31cdf2a2d4/go.mod h1:AI1NXn1DwIGIsiLOzYJsIdt60NIgNjRl2kqK8RbGqf8=
 go.mondoo.com/ranger-rpc v0.8.1 h1:DynUWByDnxI4wMHbFpXUMw+lndYJ21BAHOxrhGyVCD4=
 go.mondoo.com/ranger-rpc v0.8.1/go.mod h1:HP3hjWjgRFxCFAnY86YLMiY0bU7eqhKuP8Qm+QlFBbI=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
