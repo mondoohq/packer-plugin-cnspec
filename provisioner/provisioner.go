@@ -593,7 +593,7 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	}
 
 	provider, err := providers.EnsureProvider(providers.ProviderLookup{
-		ID: "go.mondoo.com/cnquery/v9/providers/os",
+		ID: "go.mondoo.com/mql/providers/os",
 	}, true, nil)
 	if err != nil {
 		ui.Error("could not load OS providers: " + err.Error())
