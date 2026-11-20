@@ -8,8 +8,16 @@ on:
       - "**.go"
       - "**.mod"
       - "go.sum"
+      - "test/**"
+      - "Makefile"
+      - ".github/workflows/pr-test-lint.yaml"
+      - ".github/workflows/e2e-test.yaml"
 
 jobs:
+  e2e-test:
+    name: E2E Test
+    uses: ./.github/workflows/e2e-test.yaml
+
   license-check:
     name: License Check
     runs-on: ubuntu-latest
@@ -72,7 +80,7 @@ jobs:
 
   go-auto-approve:
     runs-on: ubuntu-latest
-    needs: [goreleaser, license-check]
+    needs: [goreleaser, license-check, e2e-test]
     # For now, we only auto approve and merge cnspec bump PRs created by mondoo-tools.
     # We have to check the commit author, because the PR is created by "github-actions[bot]"
     # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#startswith
