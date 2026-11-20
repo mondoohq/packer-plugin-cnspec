@@ -8,7 +8,24 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.mondoo.com/mql/providers"
 )
+
+// TestOSProviderID guards against a regression where the OS provider ID passed
+// to providers.EnsureProvider was hardcoded to a stale path
+// (go.mondoo.com/cnquery/v9/providers/os) after the cnquery to mql rename,
+// so the provider could not be found. The ID must be derived from mql's
+// defaults and be one of the IDs mql accepts for the OS provider.
+func TestOSProviderID(t *testing.T) {
+	id, err := osProviderID()
+	require.NoError(t, err)
+	require.NotEmpty(t, id)
+
+	assert.Contains(t, providers.DefaultOsIDs, id)
+	assert.NotContains(t, id, "cnquery", "deprecated cnquery provider path")
+	assert.NotNil(t, providers.DefaultProviders.Lookup(providers.ProviderLookup{ID: id}))
+}
 
 // TestSQLiteDriverRegistered guards against a regression where the embedded
 // cnspec scan library opens a sqlite database (via scan.NewLocalScanner) but the
