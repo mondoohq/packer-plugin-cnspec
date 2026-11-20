@@ -711,8 +711,8 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 // default providers, so the ID follows upstream renames.
 func osProviderID() (string, error) {
 	p, ok := providers.DefaultProviders["os"]
-	if !ok || p == nil || p.Provider == nil || p.Provider.ID == "" {
+	if !ok || p == nil || p.Provider == nil || p.ID == "" {
 		return "", errors.New("os provider not found in default providers")
 	}
-	return p.Provider.ID, nil
+	return p.ID, nil
 }
