@@ -592,8 +592,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 		}
 	}
 
+	osID, err := osProviderID()
+	if err != nil {
+		ui.Error("could not determine OS provider ID: " + err.Error())
+		return err
+	}
+
 	provider, err := providers.EnsureProvider(providers.ProviderLookup{
-		ID: "go.mondoo.com/mql/providers/os",
+		ID: osID,
 	}, true, nil)
 	if err != nil {
 		ui.Error("could not load OS providers: " + err.Error())
@@ -699,4 +705,14 @@ func (p *Provisioner) executeCnspec(ui packer.Ui, comm packer.Communicator) erro
 	ui.Say("scan completed successfully")
 
 	return nil
+}
+
+// osProviderID returns the ID of the OS provider from mql's auto-generated
+// default providers, so the ID follows upstream renames.
+func osProviderID() (string, error) {
+	p, ok := providers.DefaultProviders["os"]
+	if !ok || p == nil || p.Provider == nil || p.ID == "" {
+		return "", errors.New("os provider not found in default providers")
+	}
+	return p.ID, nil
 }
