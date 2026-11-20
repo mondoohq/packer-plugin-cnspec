@@ -1,0 +1,74 @@
+name: E2E Test
+
+# Reusable workflow: unit tests plus a real Packer build with the locally built plugin.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Import environment variables from file
+        run: cat ".github/env" >> $GITHUB_ENV
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ">=${{ env.golang-version }}"
+          check-latest: true
+      - name: Run unit tests
+        run: go test -race ./...
+
+  e2e-docker:
+    name: E2E Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Import environment variables from file
+        run: cat ".github/env" >> $GITHUB_ENV
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ">=${{ env.golang-version }}"
+          check-latest: true
+      - name: Build plugin
+        run: |
+          CGO_ENABLED=0 go build -o packer-plugin-cnspec \
+            -ldflags="-X go.mondoo.com/mql.Version=$(cat VERSION) -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Version=1.0.0 -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Build=${GITHUB_SHA::7}"
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@ce93c3c08a6c2ff2275bf4b54ff0d9a75f6c9789 # v3.4.0
+        with:
+          version: latest
+      - name: Install plugin
+        run: packer plugins install --path ./packer-plugin-cnspec github.com/mondoohq/cnspec
+      - name: Packer init
+        run: packer init test/e2e/docker
+      - name: Packer build
+        run: |
+          set -o pipefail
+          packer build -color=false test/e2e/docker 2>&1 | tee e2e.log
+      # packer already exits non-zero on most errors; this guards against errors
+      # the provisioner reports without failing the build
+      - name: Verify scan completed
+        run: |
+          if ! grep -q "scan completed successfully" e2e.log; then
+            echo "::error::Expected 'scan completed successfully' in packer output"
+            tail -30 e2e.log
+            exit 1
+          fi
+      - name: Upload E2E log
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-log
+          path: e2e.log
+          if-no-files-found: ignore
