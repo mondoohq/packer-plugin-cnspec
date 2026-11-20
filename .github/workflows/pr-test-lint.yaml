@@ -9,6 +9,9 @@ on:
       - "**.mod"
       - "go.sum"
       - "test/**"
+      - "Makefile"
+      - ".github/workflows/pr-test-lint.yaml"
+      - ".github/workflows/e2e-test.yaml"
 
 jobs:
   e2e-test:
