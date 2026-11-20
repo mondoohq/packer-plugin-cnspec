@@ -53,6 +53,15 @@ dev/macos: build
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
+# Runs the plugin end to end in Packer against a docker container (needs docker and packer)
+.PHONY: test/e2e
+test/e2e:
+	CGO_ENABLED=0 go build -o ${BINARY} -ldflags="-X go.mondoo.com/mql.Version=${CNSPEC_VERSION} -X go.mondoo.com/packer-plugin-cnspec/provisioner/version.Version=1.0.0"
+	packer plugins install --path ./${BINARY} github.com/mondoohq/cnspec
+	packer init test/e2e/docker
+	@bash -c "set -o pipefail; packer build -color=false test/e2e/docker 2>&1 | tee e2e.log"
+	@grep -q "scan completed successfully" e2e.log
+
 test/golanglint:
 	@golangci-lint run
 

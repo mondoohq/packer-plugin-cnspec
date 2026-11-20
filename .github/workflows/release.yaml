@@ -7,7 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
+  e2e-test:
+    name: E2E Test
+    uses: ./.github/workflows/e2e-test.yaml
+
   goreleaser:
+    needs: [e2e-test]
     runs-on:
       group: arc-runners
     env:

@@ -1,0 +1,25 @@
+# Copyright Mondoo, Inc. 2026
+# SPDX-License-Identifier: BUSL-1.1
+
+policies:
+  - uid: packer-e2e-ubuntu
+    name: Packer plugin E2E policy
+    version: 1.0.0
+    authors:
+      - name: Mondoo Inc
+        email: hello@mondoo.com
+    specs:
+      - asset_filter:
+          query: |
+            platform.name == "ubuntu"
+        scoring_queries:
+          e2e-platform-is-ubuntu:
+          e2e-os-release-exists:
+    scoring_system: 2
+queries:
+  - uid: e2e-platform-is-ubuntu
+    title: Platform is Ubuntu
+    query: asset.platform == "ubuntu"
+  - uid: e2e-os-release-exists
+    title: /etc/os-release exists
+    query: file("/etc/os-release").exists
