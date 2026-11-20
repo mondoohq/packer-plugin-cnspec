@@ -1,25 +1,26 @@
 # Copyright Mondoo, Inc. 2026
 # SPDX-License-Identifier: BUSL-1.1
 
+# Minimal policy for the e2e test. All checks pass on a stock ubuntu image, so
+# the build only fails if the plugin itself is broken.
 policies:
   - uid: packer-e2e-ubuntu
     name: Packer plugin E2E policy
-    version: 1.0.0
+    version: "1.0.0"
+    scoring_system: highest impact
     authors:
       - name: Mondoo Inc
         email: hello@mondoo.com
-    specs:
-      - asset_filter:
-          query: |
-            platform.name == "ubuntu"
-        scoring_queries:
-          e2e-platform-is-ubuntu:
-          e2e-os-release-exists:
-    scoring_system: 2
-queries:
-  - uid: e2e-platform-is-ubuntu
-    title: Platform is Ubuntu
-    query: asset.platform == "ubuntu"
-  - uid: e2e-os-release-exists
-    title: /etc/os-release exists
-    query: file("/etc/os-release").exists
+    groups:
+      - title: E2E
+        filters:
+          - mql: asset.platform == "ubuntu"
+        checks:
+          - uid: e2e-platform-is-ubuntu
+            title: Platform is Ubuntu
+            mql: asset.platform == "ubuntu"
+            impact: 100
+          - uid: e2e-os-release-exists
+            title: /etc/os-release exists
+            mql: file("/etc/os-release").exists
+            impact: 100
