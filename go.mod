@@ -13,8 +13,8 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 	github.com/zclconf/go-cty v1.20.0
-	go.mondoo.com/cnspec v0.0.0-20261123120742-0cf0e177442c
-	go.mondoo.com/mql v0.0.0-20261123113545-46c447206033
+	go.mondoo.com/cnspec v0.0.0-20261124082151-c2bb325b4abc
+	go.mondoo.com/mql v0.0.0-20261124065900-b9156d371834
 	golang.org/x/crypto v0.58.0
 )
 
